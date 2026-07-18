@@ -9,7 +9,7 @@
                 <p class="mb-4 text-sm font-semibold uppercase text-primary">Admin</p>
                 <h1 class="text-3xl font-semibold leading-tight sm:text-4xl">Images</h1>
                 <p class="mt-5 text-base leading-7 text-base-content/70">
-                    Manage uploaded image metadata and generated web sizes.
+                    Manage uploaded image metadata.
                 </p>
             </div>
 
