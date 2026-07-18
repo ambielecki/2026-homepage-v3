@@ -33,6 +33,17 @@
             </article>
             <article class="card card-border bg-base-100">
                 <div class="card-body">
+                    <h2 class="card-title text-base">Images</h2>
+                    <p class="text-sm leading-6 text-base-content/70">
+                        Upload original images and generate web optimized sizes for future homepage sections.
+                    </p>
+                    <div class="card-actions justify-end">
+                        <a class="btn btn-sm" href="{{ route('admin.images.index') }}">Manage images</a>
+                    </div>
+                </div>
+            </article>
+            <article class="card card-border bg-base-100">
+                <div class="card-body">
                     <h2 class="card-title text-base">Session</h2>
                     <p class="text-sm leading-6 text-base-content/70">
                         Use the logout action in the navigation when admin work is complete.

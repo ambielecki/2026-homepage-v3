@@ -20,10 +20,13 @@
 
                 <div class="navbar-end">
                     @auth
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button class="btn btn-sm" type="submit">Logout</button>
-                        </form>
+                        <div class="flex items-center gap-2">
+                            <a class="btn btn-sm btn-ghost" href="{{ route('admin.images.index') }}">Images</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="btn btn-sm" type="submit">Logout</button>
+                            </form>
+                        </div>
                     @endauth
                 </div>
             </nav>
