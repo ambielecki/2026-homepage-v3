@@ -3,7 +3,7 @@
 @section('title', 'Login')
 
 @section('content')
-    <section class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-md px-4 pt-16 pb-20 sm:px-6 sm:pt-20 lg:px-8">
         <div class="card card-border w-full max-w-md bg-base-100 shadow-xl">
             <div class="card-body">
                 <h1 class="card-title">Login</h1>
