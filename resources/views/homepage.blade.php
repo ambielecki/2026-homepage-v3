@@ -115,8 +115,7 @@
                 <div class="mt-12 space-y-14">
                     <article class="grid gap-6 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-5">
                         <div class="lg:col-start-1 lg:row-start-1">
-                            <span class="badge badge-soft">Scuba logs</span>
-                            <h3 class="mt-4 text-2xl font-semibold leading-tight sm:text-3xl">DiveLogRepeat</h3>
+                            <h3 class="text-2xl font-semibold leading-tight sm:text-3xl">DiveLogRepeat</h3>
                         </div>
 
                         <div class="mockup-browser border border-base-300 bg-base-200 lg:col-start-2 lg:row-span-2 lg:row-start-1" role="img" aria-label="Placeholder screenshot for DiveLogRepeat">
@@ -144,8 +143,7 @@
 
                     <article class="grid gap-6 border-y border-base-300 py-14 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-5">
                         <div class="lg:col-start-2 lg:row-start-1">
-                            <span class="badge badge-soft">Homebrewing</span>
-                            <h3 class="mt-4 text-2xl font-semibold leading-tight sm:text-3xl">Homebrew Helper</h3>
+                            <h3 class="text-2xl font-semibold leading-tight sm:text-3xl">Homebrew Helper</h3>
                         </div>
 
                         <div class="mockup-browser border border-base-300 bg-base-200 lg:col-start-1 lg:row-span-2 lg:row-start-1" role="img" aria-label="Placeholder screenshot for Homebrew Helper">
@@ -173,8 +171,7 @@
 
                     <article class="grid gap-6 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-5">
                         <div class="lg:col-start-1 lg:row-start-1">
-                            <span class="badge badge-soft">Experiments</span>
-                            <h3 class="mt-4 text-2xl font-semibold leading-tight sm:text-3xl">Small tools</h3>
+                            <h3 class="text-2xl font-semibold leading-tight sm:text-3xl">Small tools</h3>
                         </div>
 
                         <div class="mockup-browser border border-base-300 bg-base-200 lg:col-start-2 lg:row-span-2 lg:row-start-1" role="img" aria-label="Placeholder screenshot for Small tools">
