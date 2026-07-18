@@ -10,7 +10,6 @@ This will serve as my homepage at https://www.andrewbielecki.com and replace the
 - There will be no registration process for the admin area
 - Admin users will be created through an artisan command
 - Admin users will be stored in a database table
-- We will include PHP Pest tests where appropriate
 - Since this is not a a SPA, we will use Laravel's built in http testing for the frontend
 - The local site should be accessible at http://bielecki.test
 
@@ -27,6 +26,11 @@ necessary PHP commands should be run in the docker container by using `docker ex
 - If we are working in branch other than main, create a PR to main after changes with the commit message
 - If a PR already exists for the branch to main, just push changes
 - Update the README.md after major functionality changes
+
+# General Coding
+- We will include PHP Pest tests where appropriate
+  - Create new test files where appropriate for new features. Tests for the homepage should be in HomePageTests, tests
+  for images would be in ImageTests
 
 ## Laravel conventions
 - Use conventional Laravel application structure
