@@ -18,10 +18,10 @@ This repository contains the Laravel application for [andrewbielecki.com](https:
 - SEO, canonical, Open Graph, and Twitter summary metadata
 - daisyUI theme with a modern blue-led palette
 - Placeholder content and image panels ready for later content management
+- Session-authenticated admin dashboard at `/admin`
+- Command-line admin user creation and password reset commands
 
 ## Planned Features
 
-- Session-authenticated admin area
 - Admin-created homepage content managed from the database
-- Artisan command for creating admin users
 - Final biography, project, image, and contact content
