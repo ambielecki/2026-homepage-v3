@@ -12,7 +12,9 @@ test('the login page renders with csrf protection', function (): void {
 
     $response
         ->assertOk()
-        ->assertSee('Sign in to manage homepage content.')
+        ->assertSee('Login')
+        ->assertDontSee('Sign in to manage homepage content.')
+        ->assertDontSee('This area is restricted to administrator accounts created from the command line.')
         ->assertSee('name="_token"', false);
 });
 
