@@ -6,3 +6,39 @@
 @source "../../storage/framework/views/*.php";
 
 @plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "bielecki";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: oklch(99% 0.004 235);
+  --color-base-200: oklch(96% 0.009 240);
+  --color-base-300: oklch(89% 0.018 245);
+  --color-base-content: oklch(21% 0.035 250);
+  --color-primary: oklch(55% 0.17 243);
+  --color-primary-content: oklch(98% 0.01 240);
+  --color-secondary: oklch(66% 0.12 182);
+  --color-secondary-content: oklch(17% 0.03 190);
+  --color-accent: oklch(76% 0.16 78);
+  --color-accent-content: oklch(22% 0.045 70);
+  --color-neutral: oklch(24% 0.035 252);
+  --color-neutral-content: oklch(98% 0.006 240);
+  --color-info: oklch(70% 0.13 230);
+  --color-info-content: oklch(18% 0.04 235);
+  --color-success: oklch(66% 0.13 155);
+  --color-success-content: oklch(17% 0.03 150);
+  --color-warning: oklch(80% 0.14 82);
+  --color-warning-content: oklch(22% 0.045 70);
+  --color-error: oklch(61% 0.18 28);
+  --color-error-content: oklch(98% 0.01 25);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
