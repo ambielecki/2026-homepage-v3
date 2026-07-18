@@ -43,6 +43,8 @@ test('authenticated admins can view the upload form', function (): void {
     $response
         ->assertOk()
         ->assertSee('Upload image')
+        ->assertSee('for="image"', false)
+        ->assertSee('id="image"', false)
         ->assertSee('name="image"', false)
         ->assertSee('name="alt_text"', false)
         ->assertSee('name="description"', false)

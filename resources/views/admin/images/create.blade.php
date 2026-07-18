@@ -13,7 +13,11 @@
 
                     <fieldset class="fieldset">
                         <legend class="fieldset-legend">Image file</legend>
-                        <input class="file-input w-full @error('image') file-input-error @enderror" type="file" name="image" accept="image/*" required>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <label class="btn" for="image">Choose file</label>
+                            <span class="text-sm text-base-content/70" data-file-name>No file selected</span>
+                        </div>
+                        <input id="image" class="sr-only" type="file" name="image" accept="image/*" required data-file-input>
                         @error('image')
                             <p class="label text-error">{{ $message }}</p>
                         @enderror
