@@ -24,6 +24,7 @@ test('the homepage includes professional profile metadata and sections', functio
         ->assertSee('Placeholder screenshot for Homebrew Helper')
         ->assertSee('Small tools')
         ->assertSee('Placeholder screenshot for Small tools')
+        ->assertDontSee('Project notes')
         ->assertSee('Professional experience still does the heavy lifting.')
         ->assertSee('Looking for a lead engineer who can bridge product, architecture, and delivery?')
         ->assertSee('href="#github-placeholder"', false)

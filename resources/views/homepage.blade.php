@@ -137,11 +137,8 @@
 
                         <div class="max-w-xl lg:col-start-1 lg:row-start-2">
                             <p class="text-base leading-7 text-base-content/70">
-                                Placeholder copy for a dive log and hobby project that tracks trips, notes, and the details that make dives memorable.
+                                Placeholder copy for a dive log and hobby project that tracks trips, notes, and the details that make dives memorable. This area will eventually describe the core workflow, the reason the project exists, and what makes it useful enough to keep refining between real-world dives and trip planning.
                             </p>
-                            <div class="mt-6">
-                                <a class="btn btn-sm" href="#contact">Project notes</a>
-                            </div>
                         </div>
                     </article>
 
@@ -169,11 +166,8 @@
 
                         <div class="max-w-xl lg:col-start-2 lg:row-start-2">
                             <p class="text-base leading-7 text-base-content/70">
-                                Placeholder copy for brewing notes, recipe experiments, and a simple place to keep batches from disappearing into old spreadsheets.
+                                Placeholder copy for brewing notes, recipe experiments, and a simple place to keep batches from disappearing into old spreadsheets. This area will eventually explain how the project supports repeatable batches, captures lessons from each brew day, and turns scattered notes into something easier to revisit.
                             </p>
-                            <div class="mt-6">
-                                <a class="btn btn-sm" href="#contact">Project notes</a>
-                            </div>
                         </div>
                     </article>
 
@@ -200,11 +194,8 @@
 
                         <div class="max-w-xl lg:col-start-1 lg:row-start-2">
                             <p class="text-base leading-7 text-base-content/70">
-                                Placeholder copy for side utilities, learning projects, and weekend builds that are useful enough to keep around.
+                                Placeholder copy for side utilities, learning projects, and weekend builds that are useful enough to keep around. This area will eventually collect the small tools that solve recurring annoyances, test out new ideas, and give me a practical place to experiment outside production work.
                             </p>
-                            <div class="mt-6">
-                                <a class="btn btn-sm" href="#contact">Project notes</a>
-                            </div>
                         </div>
                     </article>
                 </div>
