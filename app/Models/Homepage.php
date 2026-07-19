@@ -164,8 +164,8 @@ class Homepage extends Model
             'contact_headline' => 'Contact',
             'contact_title' => 'Looking for a lead engineer who can bridge product, architecture, and delivery?',
             'contact_description' => 'This area will eventually include final contact details. For now, it provides the intended shape for employer-focused calls to action.',
-            'github_url' => null,
-            'linkedin_url' => null,
+            'github_url' => 'https://github.com/andrewbielecki',
+            'linkedin_url' => 'https://www.linkedin.com/in/andrewbielecki',
         ];
     }
 
