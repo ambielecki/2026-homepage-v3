@@ -68,6 +68,7 @@
                                 <td class="text-sm text-base-content/70">{{ $homepage->updated_at->format('M j, Y g:i A') }}</td>
                                 <td>
                                     <div class="flex flex-wrap justify-end gap-2">
+                                        <a class="btn btn-sm" href="{{ route('admin.homepage.preview', $homepage) }}" target="_blank" rel="noopener">Preview</a>
                                         <a class="btn btn-sm" href="{{ route('admin.homepage.edit', $homepage) }}">Edit</a>
                                         <form method="POST" action="{{ route('admin.homepage.duplicate', $homepage) }}">
                                             @csrf

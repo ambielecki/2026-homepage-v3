@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="{{ $metaDescription }}">
-        <meta name="robots" content="index, follow">
+        <meta name="robots" content="{{ ($isPreview ?? false) ? 'noindex, nofollow' : 'index, follow' }}">
         <link rel="canonical" href="https://www.andrewbielecki.com">
 
         <meta property="og:type" content="website">
@@ -21,6 +21,26 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-base-100 text-base-content antialiased">
+        @if ($isPreview ?? false)
+            <div class="border-b border-base-300 bg-base-200">
+                <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+                    <div>
+                        <span class="font-semibold">Preview:</span>
+                        {{ $homepage->name }}
+                        @if ($homepage->is_active)
+                            <span class="badge badge-success ml-2">Active</span>
+                        @else
+                            <span class="badge ml-2">Draft</span>
+                        @endif
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <a class="btn btn-sm" href="{{ route('admin.homepage.edit', $homepage) }}">Edit version</a>
+                        <a class="btn btn-sm" href="{{ route('admin.homepage.index') }}">All versions</a>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <header class="border-b border-base-300 bg-base-100/95">
             <nav class="navbar mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Primary navigation">
                 <div class="navbar-start">

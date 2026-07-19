@@ -21,6 +21,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function (): v
         Route::get('/', [AdminHomepageController::class, 'index'])->name('index');
         Route::post('/', [AdminHomepageController::class, 'store'])->name('store');
         Route::get('/images', [ImageController::class, 'picker'])->name('images');
+        Route::get('/{homepage}/preview', [AdminHomepageController::class, 'preview'])->name('preview');
         Route::get('/{homepage}/edit', [AdminHomepageController::class, 'edit'])->name('edit');
         Route::put('/{homepage}', [AdminHomepageController::class, 'update'])->name('update');
         Route::post('/{homepage}/activate', [AdminHomepageController::class, 'activate'])->name('activate');

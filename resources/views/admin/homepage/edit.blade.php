@@ -56,6 +56,7 @@
 
             <div class="flex flex-wrap gap-2">
                 <a class="btn" href="{{ route('admin.homepage.index') }}">Back</a>
+                <a class="btn" href="{{ route('admin.homepage.preview', $homepage) }}" target="_blank" rel="noopener">Preview</a>
                 <form method="POST" action="{{ route('admin.homepage.duplicate', $homepage) }}">
                     @csrf
                     <button class="btn" type="submit">Duplicate</button>

@@ -17,6 +17,7 @@ test('homepage admin routes require authentication', function (): void {
 
     $this->get('/admin/homepage')->assertRedirect('/login');
     $this->get(sprintf('/admin/homepage/%s/edit', $homepage->id))->assertRedirect('/login');
+    $this->get(sprintf('/admin/homepage/%s/preview', $homepage->id))->assertRedirect('/login');
 });
 
 test('authenticated admins can view homepage versions', function (): void {
@@ -36,7 +37,40 @@ test('authenticated admins can view homepage versions', function (): void {
         ->assertSee('Published homepage')
         ->assertSee('Draft homepage')
         ->assertSee('Active')
+        ->assertSee('Preview')
         ->assertSee('Create draft');
+});
+
+test('authenticated admins can preview any homepage version without activating it', function (): void {
+    $user = User::factory()->create();
+    $active = Homepage::factory()->active()->create([
+        'hero_title' => 'Currently active homepage',
+    ]);
+    $draft = Homepage::factory()->create([
+        'name' => 'Preview draft',
+        'hero_headline' => 'Draft headline',
+        'hero_title' => 'Draft homepage title',
+        'hero_description' => 'Draft homepage description.',
+    ]);
+    HomepageExpertiseCard::factory()->for($draft)->create([
+        'title' => 'Draft expertise',
+        'description' => 'Draft expertise description.',
+        'is_active' => true,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('admin.homepage.preview', $draft));
+
+    $response
+        ->assertOk()
+        ->assertSee('content="noindex, nofollow"', false)
+        ->assertSee('Preview draft')
+        ->assertSee('Draft homepage title')
+        ->assertSee('Draft expertise')
+        ->assertSee('Edit version')
+        ->assertDontSee('Currently active homepage');
+
+    expect($active->fresh()->is_active)->toBeTrue()
+        ->and($draft->fresh()->is_active)->toBeFalse();
 });
 
 test('authenticated admins can create a draft homepage version with default rows', function (): void {

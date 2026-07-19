@@ -57,6 +57,21 @@ class HomepageController extends Controller
         ]);
     }
 
+    public function preview(Homepage $homepage): View
+    {
+        $homepage->load([
+            'heroImage',
+            'activeExpertiseCards',
+            'activeProjects.image',
+            'activeExperiences',
+        ]);
+
+        return view('homepage', [
+            'homepage' => $homepage,
+            'isPreview' => true,
+        ]);
+    }
+
     public function update(UpdateHomepageRequest $request, Homepage $homepage): RedirectResponse
     {
         $validated = $request->validated();
