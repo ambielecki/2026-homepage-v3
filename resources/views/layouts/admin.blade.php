@@ -21,6 +21,7 @@
                 <div class="navbar-end">
                     @auth
                         <div class="flex items-center gap-2">
+                            <a class="btn btn-sm btn-ghost" href="/">Live</a>
                             <a class="btn btn-sm btn-ghost" href="{{ route('admin.homepage.index') }}">Homepage</a>
                             <a class="btn btn-sm btn-ghost" href="{{ route('admin.images.index') }}">Images</a>
                             <form method="POST" action="{{ route('logout') }}">
