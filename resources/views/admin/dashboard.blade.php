@@ -19,15 +19,18 @@
                 <div class="card-body">
                     <h2 class="card-title text-base">Content</h2>
                     <p class="text-sm leading-6 text-base-content/70">
-                        Future controls will manage homepage copy, sections, and calls to action.
+                        Manage homepage versions, section copy, repeatable cards, hobby projects, and contact links.
                     </p>
+                    <div class="card-actions justify-end">
+                        <a class="btn btn-sm" href="{{ route('admin.homepage.index') }}">Manage homepage</a>
+                    </div>
                 </div>
             </article>
             <article class="card card-border bg-base-100">
                 <div class="card-body">
                     <h2 class="card-title text-base">Projects</h2>
                     <p class="text-sm leading-6 text-base-content/70">
-                        Future controls will manage hobby project descriptions and screenshots.
+                        Hobby project descriptions and screenshots are edited inside each homepage version.
                     </p>
                 </div>
             </article>
