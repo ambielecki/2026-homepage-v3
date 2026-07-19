@@ -175,6 +175,41 @@ test('authenticated admins can save homepage edits as a new draft version', func
         ->and($newHomepage->experiences()->firstOrFail()->is_active)->toBeFalse();
 });
 
+test('authenticated admins can save a homepage without contact description text', function (): void {
+    $user = User::factory()->create();
+    $homepage = Homepage::factory()->create();
+
+    $response = $this->actingAs($user)->put(route('admin.homepage.update', $homepage), [
+        'name' => 'No contact description',
+        'hero_headline' => 'Hero headline',
+        'hero_title' => 'Hero title',
+        'hero_description' => 'Hero description.',
+        'expertise_headline' => 'Expertise headline',
+        'expertise_title' => 'Expertise title',
+        'projects_headline' => 'Projects headline',
+        'projects_title' => 'Projects title',
+        'projects_description' => 'Projects description.',
+        'experience_headline' => 'Experience headline',
+        'experience_title' => 'Experience title',
+        'experience_description' => 'Experience description.',
+        'contact_headline' => 'Contact headline',
+        'contact_title' => 'Contact title',
+        'contact_description' => null,
+        'github_url' => 'https://github.com/andrewbielecki',
+        'linkedin_url' => 'https://www.linkedin.com/in/andrewbielecki',
+    ]);
+
+    $newHomepage = Homepage::query()
+        ->where('name', 'No contact description')
+        ->firstOrFail();
+
+    $response
+        ->assertRedirect(route('admin.homepage.edit', $newHomepage))
+        ->assertSessionHas('status', 'Homepage saved as a new draft version.');
+
+    expect($newHomepage->contact_description)->toBeNull();
+});
+
 test('authenticated admins can activate one homepage version', function (): void {
     $user = User::factory()->create();
     $active = Homepage::factory()->active()->create();

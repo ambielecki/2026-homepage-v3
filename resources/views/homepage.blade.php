@@ -207,9 +207,11 @@
                             <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">
                                 {{ $homepage->contact_title }}
                             </h2>
-                            <div class="mt-5 text-base leading-7 text-neutral-content/75">
-                                {!! $homepage->contact_description !!}
-                            </div>
+                            @if (filled($homepage->contact_description))
+                                <div class="mt-5 text-base leading-7 text-neutral-content/75">
+                                    {!! $homepage->contact_description !!}
+                                </div>
+                            @endif
                         </div>
                         @if ($homepage->github_url || $homepage->linkedin_url)
                             <div class="card-actions shrink-0">

@@ -35,7 +35,7 @@ class UpdateHomepageRequest extends FormRequest
             'experience_description' => ['required', 'string', 'max:2000'],
             'contact_headline' => ['required', 'string', 'max:255'],
             'contact_title' => ['required', 'string', 'max:255'],
-            'contact_description' => ['required', 'string', 'max:2000'],
+            'contact_description' => ['nullable', 'string', 'max:2000'],
             'github_url' => ['nullable', 'url', 'max:255'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],
             'expertise_cards' => ['nullable', 'array'],

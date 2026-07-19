@@ -110,3 +110,21 @@ test('the homepage renders the active database version and hides inactive rows',
         ->assertDontSee('Start a conversation')
         ->assertDontSee('View hobby projects');
 });
+
+test('the homepage omits the contact description when it is empty', function (): void {
+    Homepage::factory()->active()->create([
+        'contact_title' => 'Contact without description',
+        'contact_description' => null,
+        'github_url' => 'https://github.com/andrewbielecki',
+        'linkedin_url' => 'https://www.linkedin.com/in/andrewbielecki',
+    ]);
+
+    $response = $this->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSee('Contact without description')
+        ->assertSee('href="https://github.com/andrewbielecki"', false)
+        ->assertSee('href="https://www.linkedin.com/in/andrewbielecki"', false)
+        ->assertDontSee('text-neutral-content/75', false);
+});

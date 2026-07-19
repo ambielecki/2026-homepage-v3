@@ -405,7 +405,7 @@
 
                     <fieldset class="fieldset">
                         <legend class="fieldset-legend">Description</legend>
-                        <textarea class="textarea min-h-28 w-full @error('contact_description') textarea-error @enderror" name="contact_description" required data-rich-text>{{ old('contact_description', $homepage->contact_description) }}</textarea>
+                        <textarea class="textarea min-h-28 w-full @error('contact_description') textarea-error @enderror" name="contact_description" data-rich-text>{{ old('contact_description', $homepage->contact_description) }}</textarea>
                         @error('contact_description')
                             <p class="label text-error">{{ $message }}</p>
                         @enderror
