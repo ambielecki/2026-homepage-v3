@@ -8,6 +8,7 @@ use Database\Factories\ImageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
@@ -47,6 +48,22 @@ class Image extends Model
     public function originalUrl(): string
     {
         return Storage::disk('public')->url($this->original_path);
+    }
+
+    /**
+     * @return HasMany<Homepage, Image>
+     */
+    public function homepages(): HasMany
+    {
+        return $this->hasMany(Homepage::class, 'hero_image_id');
+    }
+
+    /**
+     * @return HasMany<HomepageProject, Image>
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(HomepageProject::class);
     }
 
     public function sizedPath(string $size): string

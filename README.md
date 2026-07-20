@@ -27,6 +27,7 @@ This repository contains the Laravel application for [andrewbielecki.com](https:
 - Session-authenticated admin dashboard at `/admin`
 - Command-line admin user creation and password reset commands
 - Admin image uploads with original file storage and generated WebP sizes
+- Protected admin image deletion that removes unused stored image files
 - Selectable uploaded images for homepage hero and hobby project media
 
 ## Planned Features

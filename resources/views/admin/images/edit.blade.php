@@ -12,6 +12,8 @@
             <div class="card-body">
                 <h1 class="card-title">Edit image</h1>
 
+                @include('admin.images.partials.delete-blocked-alert')
+
                 <form class="mt-4 space-y-4" method="POST" action="{{ route('admin.images.update', $image) }}">
                     @csrf
                     @method('PUT')
@@ -23,6 +25,13 @@
                         <button class="btn btn-primary" type="submit">Save</button>
                     </div>
                 </form>
+
+                <div class="card-actions justify-end border-t border-base-300 pt-4">
+                    @include('admin.images.partials.delete-modal', [
+                        'image' => $image,
+                        'buttonClass' => 'btn btn-error',
+                    ])
+                </div>
             </div>
         </div>
     </section>

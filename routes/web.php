@@ -47,6 +47,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function (): v
         Route::post('/', [ImageController::class, 'store'])->name('store');
         Route::get('/{image}/edit', [ImageController::class, 'edit'])->name('edit');
         Route::put('/{image}', [ImageController::class, 'update'])->name('update');
+        Route::delete('/{image}', [ImageController::class, 'destroy'])->name('destroy');
     });
 });
 
