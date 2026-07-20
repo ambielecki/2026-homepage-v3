@@ -171,6 +171,15 @@
                 <div class="card-body">
                     <h2 class="card-title">Expertise section</h2>
 
+                    <label class="flex items-start justify-between gap-4 rounded-box border border-base-300 p-4">
+                        <span>
+                            <span class="block font-medium">Show Expertise section</span>
+                            <span class="mt-1 block text-sm text-base-content/70">Controls whether this section appears on the public homepage and previews.</span>
+                        </span>
+                        <input type="hidden" name="show_expertise_section" value="0">
+                        <input class="toggle" type="checkbox" name="show_expertise_section" value="1" @checked(old('show_expertise_section', $homepage->show_expertise_section))>
+                    </label>
+
                     <div class="grid gap-4 lg:grid-cols-2">
                         <fieldset class="fieldset">
                             <legend class="fieldset-legend">Headline</legend>
@@ -242,6 +251,15 @@
             <div class="card card-border bg-base-100">
                 <div class="card-body">
                     <h2 class="card-title">Experience section</h2>
+
+                    <label class="flex items-start justify-between gap-4 rounded-box border border-base-300 p-4">
+                        <span>
+                            <span class="block font-medium">Show Experience section</span>
+                            <span class="mt-1 block text-sm text-base-content/70">Controls whether this section appears on the public homepage and previews.</span>
+                        </span>
+                        <input type="hidden" name="show_experience_section" value="0">
+                        <input class="toggle" type="checkbox" name="show_experience_section" value="1" @checked(old('show_experience_section', $homepage->show_experience_section))>
+                    </label>
 
                     <div class="grid gap-4 lg:grid-cols-2">
                         <fieldset class="fieldset">

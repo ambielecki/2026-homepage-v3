@@ -136,6 +136,8 @@ test('the homepage renders the active database version and hides inactive rows',
         ->assertSee('Active expertise card')
         ->assertSee('<a class="link link-hover" href="https://showmyrides.com">Active hobby project</a>', false)
         ->assertSee('<a href="https://showmyrides.com">ShowMyRides</a>', false)
+        ->assertSee('href="#expertise"', false)
+        ->assertSee('href="#projects"', false)
         ->assertSee('[&amp;_a]:text-blue-600', false)
         ->assertSee('text-base-content/85', false)
         ->assertSee('Project screenshot alt text')
@@ -150,6 +152,39 @@ test('the homepage renders the active database version and hides inactive rows',
         ->assertDontSee('Inactive experience card')
         ->assertDontSee('Start a conversation')
         ->assertDontSee('View hobby projects');
+});
+
+test('the homepage hides disabled optional sections for the active version', function (): void {
+    $homepage = Homepage::factory()->active()->create([
+        'show_expertise_section' => false,
+        'show_experience_section' => false,
+        'expertise_title' => 'Hidden expertise section title',
+        'experience_title' => 'Hidden experience section title',
+    ]);
+
+    $expertise = HomepageExpertiseCard::factory()->create([
+        'title' => 'Hidden expertise card',
+        'description' => 'Hidden expertise card description.',
+    ]);
+    $experience = HomepageExperience::factory()->create([
+        'title' => 'Hidden experience card',
+        'description' => 'Hidden experience card description.',
+    ]);
+
+    $homepage->expertiseCards()->attach($expertise, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->experiences()->attach($experience, ['sort_order' => 1, 'is_active' => true]);
+
+    $response = $this->get('/');
+
+    $response
+        ->assertOk()
+        ->assertDontSee('id="expertise"', false)
+        ->assertDontSee('id="experience"', false)
+        ->assertDontSee('href="#expertise"', false)
+        ->assertDontSee('Hidden expertise section title')
+        ->assertDontSee('Hidden expertise card')
+        ->assertDontSee('Hidden experience section title')
+        ->assertDontSee('Hidden experience card');
 });
 
 test('the homepage omits the contact description when it is empty', function (): void {
