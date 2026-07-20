@@ -65,11 +65,11 @@
         <main id="top">
             <section class="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1fr_0.9fr] lg:px-8 lg:py-24">
                 <div class="max-w-3xl">
-                    <p class="mb-5 text-sm font-semibold uppercase text-primary">{{ $homepage->hero_headline }}</p>
+                    <p class="mb-5 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->hero_headline }}</p>
                     <h1 class="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
                         {{ $homepage->hero_title }}
                     </h1>
-                    <div class="mt-6 max-w-2xl text-lg leading-8 text-base-content/75 {{ $richTextClasses }}">
+                    <div class="mt-6 max-w-2xl text-lg leading-8 text-base-content/85 {{ $richTextClasses }}">
                         {!! $homepage->hero_description !!}
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                 <section id="expertise" class="bg-base-200 py-16 sm:py-20">
                     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div class="max-w-3xl">
-                            <p class="mb-4 text-sm font-semibold uppercase text-primary">{{ $homepage->expertise_headline }}</p>
+                            <p class="mb-4 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->expertise_headline }}</p>
                             <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">
                                 {{ $homepage->expertise_title }}
                             </h2>
@@ -106,7 +106,7 @@
                                 <article class="card card-border bg-base-100">
                                     <div class="card-body">
                                         <h3 class="card-title text-base">{{ $card->title }}</h3>
-                                        <div class="text-sm leading-6 text-base-content/70 {{ $richTextClasses }}">
+                                        <div class="text-sm leading-6 text-base-content/85 {{ $richTextClasses }}">
                                             {!! $card->description !!}
                                         </div>
                                     </div>
@@ -120,11 +120,11 @@
             @if ($homepage->activeProjects->isNotEmpty())
                 <section id="projects" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
                     <div class="max-w-4xl">
-                        <p class="mb-4 text-sm font-semibold uppercase text-primary">{{ $homepage->projects_headline }}</p>
+                        <p class="mb-4 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->projects_headline }}</p>
                         <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">
                             {{ $homepage->projects_title }}
                         </h2>
-                        <div class="mt-5 text-base leading-7 text-base-content/70 {{ $richTextClasses }}">
+                        <div class="mt-5 text-base leading-7 text-base-content/85 {{ $richTextClasses }}">
                             {!! $homepage->projects_description !!}
                         </div>
                     </div>
@@ -169,7 +169,7 @@
                                 </div>
 
                                 <div class="max-w-xl {{ $textColumn }} lg:row-start-2">
-                                    <div class="text-base leading-7 text-base-content/70 {{ $richTextClasses }}">
+                                    <div class="text-base leading-7 text-base-content/85 {{ $richTextClasses }}">
                                         {!! $project->description !!}
                                     </div>
                                 </div>
@@ -183,11 +183,11 @@
                 <section id="experience" class="bg-base-200 py-16 sm:py-20">
                     <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.7fr_1fr] lg:px-8">
                         <div>
-                            <p class="mb-4 text-sm font-semibold uppercase text-primary">{{ $homepage->experience_headline }}</p>
+                            <p class="mb-4 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->experience_headline }}</p>
                             <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">
                                 {{ $homepage->experience_title }}
                             </h2>
-                            <div class="mt-5 text-base leading-7 text-base-content/70 {{ $richTextClasses }}">
+                            <div class="mt-5 text-base leading-7 text-base-content/85 {{ $richTextClasses }}">
                                 {!! $homepage->experience_description !!}
                             </div>
                         </div>
@@ -197,7 +197,7 @@
                                 <article class="card card-border bg-base-100">
                                     <div class="card-body">
                                         <h3 class="card-title text-base">{{ $experience->title }}</h3>
-                                        <div class="text-sm leading-6 text-base-content/70 {{ $richTextClasses }}">
+                                        <div class="text-sm leading-6 text-base-content/85 {{ $richTextClasses }}">
                                             {!! $experience->description !!}
                                         </div>
                                     </div>
