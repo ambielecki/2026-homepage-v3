@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HomepageController as AdminHomepageController;
+use App\Http\Controllers\Admin\HomepageExperienceController;
+use App\Http\Controllers\Admin\HomepageExpertiseCardController;
+use App\Http\Controllers\Admin\HomepageProjectController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
@@ -26,7 +29,14 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function (): v
         Route::put('/{homepage}', [AdminHomepageController::class, 'update'])->name('update');
         Route::post('/{homepage}/activate', [AdminHomepageController::class, 'activate'])->name('activate');
         Route::post('/{homepage}/duplicate', [AdminHomepageController::class, 'duplicate'])->name('duplicate');
+        Route::delete('/{homepage}', [AdminHomepageController::class, 'destroy'])->name('destroy');
     });
+
+    Route::resource('projects', HomepageProjectController::class)->except(['show', 'destroy']);
+    Route::resource('experiences', HomepageExperienceController::class)->except(['show', 'destroy']);
+    Route::resource('expertise', HomepageExpertiseCardController::class)->parameters([
+        'expertise' => 'expertise',
+    ])->except(['show', 'destroy']);
 
     Route::prefix('images')->name('images.')->group(function (): void {
         Route::get('/', [ImageController::class, 'index'])->name('index');

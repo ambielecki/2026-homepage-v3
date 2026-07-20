@@ -53,44 +53,41 @@ test('the homepage renders the active database version and hides inactive rows',
         'linkedin_url' => 'https://www.linkedin.com/in/andrewbielecki',
     ]);
 
-    HomepageExpertiseCard::factory()->for($homepage)->create([
+    $activeExpertise = HomepageExpertiseCard::factory()->create([
         'title' => 'Active expertise card',
         'description' => 'Visible expertise description.',
-        'sort_order' => 1,
-        'is_active' => true,
     ]);
-    HomepageExpertiseCard::factory()->for($homepage)->create([
+    $inactiveExpertise = HomepageExpertiseCard::factory()->create([
         'title' => 'Inactive expertise card',
-        'is_active' => false,
     ]);
+    $homepage->expertiseCards()->attach($activeExpertise, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->expertiseCards()->attach($inactiveExpertise, ['sort_order' => 2, 'is_active' => false]);
 
     $projectImage = Image::factory()->create([
         'alt_text' => 'Project screenshot alt text',
     ]);
 
-    HomepageProject::factory()->for($homepage)->create([
+    $activeProject = HomepageProject::factory()->create([
         'image_id' => $projectImage->id,
         'title' => 'Active hobby project',
         'url' => 'https://showmyrides.com',
         'description' => 'Visible hobby project description with <a href="https://showmyrides.com">ShowMyRides</a> link.',
-        'sort_order' => 1,
-        'is_active' => true,
     ]);
-    HomepageProject::factory()->for($homepage)->create([
+    $inactiveProject = HomepageProject::factory()->create([
         'title' => 'Inactive hobby project',
-        'is_active' => false,
     ]);
+    $homepage->projects()->attach($activeProject, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->projects()->attach($inactiveProject, ['sort_order' => 2, 'is_active' => false]);
 
-    HomepageExperience::factory()->for($homepage)->create([
+    $activeExperience = HomepageExperience::factory()->create([
         'title' => 'Active experience card',
         'description' => 'Visible experience description.',
-        'sort_order' => 1,
-        'is_active' => true,
     ]);
-    HomepageExperience::factory()->for($homepage)->create([
+    $inactiveExperience = HomepageExperience::factory()->create([
         'title' => 'Inactive experience card',
-        'is_active' => false,
     ]);
+    $homepage->experiences()->attach($activeExperience, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->experiences()->attach($inactiveExperience, ['sort_order' => 2, 'is_active' => false]);
 
     $response = $this->get('/');
 

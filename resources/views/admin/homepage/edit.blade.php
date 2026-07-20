@@ -4,40 +4,40 @@
 
 @section('content')
     @php
-        $expertiseRows = old('expertise_cards', $homepage->expertiseCards->map(fn ($card) => [
-            'id' => $card->id,
-            'title' => $card->title,
-            'description' => $card->description,
-            'sort_order' => $card->sort_order,
-            'is_active' => $card->is_active,
-            'remove' => false,
-        ])->all());
-        $expertiseRows[] = ['id' => null, 'title' => '', 'description' => '', 'sort_order' => count($expertiseRows) + 1, 'is_active' => true, 'remove' => false];
-
-        $projectRows = old('projects', $homepage->projects->map(fn ($project) => [
-            'id' => $project->id,
-            'image_id' => $project->image_id,
-            'title' => $project->title,
-            'url' => $project->url,
-            'description' => $project->description,
-            'sort_order' => $project->sort_order,
-            'is_active' => $project->is_active,
-            'remove' => false,
-        ])->all());
-        $projectRows[] = ['id' => null, 'image_id' => null, 'title' => '', 'url' => '', 'description' => '', 'sort_order' => count($projectRows) + 1, 'is_active' => true, 'remove' => false];
-
-        $experienceRows = old('experiences', $homepage->experiences->map(fn ($experience) => [
-            'id' => $experience->id,
-            'title' => $experience->title,
-            'description' => $experience->description,
-            'sort_order' => $experience->sort_order,
-            'is_active' => $experience->is_active,
-            'remove' => false,
-        ])->all());
-        $experienceRows[] = ['id' => null, 'title' => '', 'description' => '', 'sort_order' => count($experienceRows) + 1, 'is_active' => true, 'remove' => false];
-
         $selectedHeroImageId = old('hero_image_id', $homepage->hero_image_id);
         $selectedHeroImage = $selectedHeroImageId ? $images->firstWhere('id', (int) $selectedHeroImageId) : null;
+
+        $assignmentRows = function ($items, $assignedItems, string $group, string $editRoute) {
+            $oldRows = old($group);
+            $oldRowsById = is_array($oldRows)
+                ? collect($oldRows)
+                    ->filter(fn ($row) => is_array($row) && filled($row['id'] ?? null))
+                    ->keyBy(fn ($row) => (int) $row['id'])
+                : collect();
+            $assignedById = $assignedItems->keyBy('id');
+
+            return $items
+                ->map(function ($item, int $index) use ($assignedById, $editRoute, $oldRowsById): array {
+                    $oldRow = $oldRowsById->get($item->id);
+                    $hasOldRow = is_array($oldRow);
+                    $assigned = $assignedById->get($item->id);
+
+                    return [
+                        'id' => $item->id,
+                        'title' => $item->title,
+                        'description' => $item->description,
+                        'edit_url' => route($editRoute, $item),
+                        'sort_order' => $hasOldRow ? (int) ($oldRow['sort_order'] ?? 0) : (int) ($assigned?->pivot?->sort_order ?? $index + 1),
+                        'is_active' => $hasOldRow ? array_key_exists('is_active', $oldRow) : (bool) ($assigned?->pivot?->is_active ?? false),
+                    ];
+                })
+                ->sortBy('sort_order')
+                ->values();
+        };
+
+        $expertiseRows = $assignmentRows($expertiseCards, $homepage->expertiseCards, 'expertise_cards', 'admin.expertise.edit');
+        $projectRows = $assignmentRows($projects, $homepage->projects, 'projects', 'admin.projects.edit');
+        $experienceRows = $assignmentRows($experiences, $homepage->experiences, 'experiences', 'admin.experiences.edit');
     @endphp
 
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
@@ -165,49 +165,13 @@
                         </fieldset>
                     </div>
 
-                    <div class="mt-4 space-y-5">
-                        @foreach ($expertiseRows as $index => $row)
-                            <div class="rounded-box border border-base-300 p-4">
-                                <input type="hidden" name="expertise_cards[{{ $index }}][id]" value="{{ $row['id'] }}">
-
-                                <div class="grid gap-4 lg:grid-cols-[6rem_1fr_1fr]">
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Order</legend>
-                                        <input class="input w-full @error('expertise_cards.' . $index . '.sort_order') input-error @enderror" type="number" min="0" max="999" name="expertise_cards[{{ $index }}][sort_order]" value="{{ $row['sort_order'] ?? $index + 1 }}">
-                                    </fieldset>
-
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Title</legend>
-                                        <input class="input w-full @error('expertise_cards.' . $index . '.title') input-error @enderror" type="text" name="expertise_cards[{{ $index }}][title]" value="{{ $row['title'] ?? '' }}">
-                                        @error('expertise_cards.' . $index . '.title')
-                                            <p class="label text-error">{{ $message }}</p>
-                                        @enderror
-                                    </fieldset>
-
-                                    <div class="flex items-end gap-4 pb-2">
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input class="toggle toggle-sm" type="checkbox" name="expertise_cards[{{ $index }}][is_active]" value="1" @checked((bool) ($row['is_active'] ?? true))>
-                                            Active
-                                        </label>
-                                        @if ($row['id'])
-                                            <label class="flex items-center gap-2 text-sm text-error">
-                                                <input class="checkbox checkbox-sm" type="checkbox" name="expertise_cards[{{ $index }}][remove]" value="1" @checked((bool) ($row['remove'] ?? false))>
-                                                Remove
-                                            </label>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <fieldset class="fieldset">
-                                    <legend class="fieldset-legend">Description</legend>
-                                    <textarea class="textarea min-h-24 w-full @error('expertise_cards.' . $index . '.description') textarea-error @enderror" name="expertise_cards[{{ $index }}][description]" data-rich-text>{{ $row['description'] ?? '' }}</textarea>
-                                    @error('expertise_cards.' . $index . '.description')
-                                        <p class="label text-error">{{ $message }}</p>
-                                    @enderror
-                                </fieldset>
-                            </div>
-                        @endforeach
-                    </div>
+                    @include('admin.homepage.partials.assignment-table', [
+                        'title' => 'Expertise',
+                        'group' => 'expertise_cards',
+                        'rows' => $expertiseRows,
+                        'manageRoute' => route('admin.expertise.index'),
+                        'emptyText' => 'Create expertise cards before assigning them to this version.',
+                    ])
                 </div>
             </div>
 
@@ -241,76 +205,13 @@
                         @enderror
                     </fieldset>
 
-                    <div class="mt-4 space-y-5">
-                        @foreach ($projectRows as $index => $row)
-                            <div class="rounded-box border border-base-300 p-4">
-                                <input type="hidden" name="projects[{{ $index }}][id]" value="{{ $row['id'] }}">
-
-                                <div class="grid gap-4 lg:grid-cols-[6rem_1fr_1fr]">
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Order</legend>
-                                        <input class="input w-full @error('projects.' . $index . '.sort_order') input-error @enderror" type="number" min="0" max="999" name="projects[{{ $index }}][sort_order]" value="{{ $row['sort_order'] ?? $index + 1 }}">
-                                    </fieldset>
-
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Title</legend>
-                                        <input class="input w-full @error('projects.' . $index . '.title') input-error @enderror" type="text" name="projects[{{ $index }}][title]" value="{{ $row['title'] ?? '' }}">
-                                        @error('projects.' . $index . '.title')
-                                            <p class="label text-error">{{ $message }}</p>
-                                        @enderror
-                                    </fieldset>
-
-                                    @php
-                                        $projectImageId = $row['image_id'] ?? null;
-                                        $projectImage = $projectImageId ? $images->firstWhere('id', (int) $projectImageId) : null;
-                                        $projectImageInputId = 'project_' . $index . '_image_id';
-                                        $projectImageLabelId = 'project_' . $index . '_image_label';
-                                    @endphp
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Image</legend>
-                                        <input id="{{ $projectImageInputId }}" type="hidden" name="projects[{{ $index }}][image_id]" value="{{ $projectImageId }}">
-                                        <div class="flex flex-col gap-3 rounded-box border border-base-300 p-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <span id="{{ $projectImageLabelId }}" class="text-sm text-base-content/70">
-                                                {{ $projectImage?->alt_text ?? 'Use mockup placeholder' }}
-                                            </span>
-                                            <button class="btn btn-sm" type="button" data-image-picker-open data-target-input="{{ $projectImageInputId }}" data-target-label="{{ $projectImageLabelId }}" data-header-only="0" data-placeholder="Use mockup placeholder">
-                                                Select image
-                                            </button>
-                                        </div>
-                                    </fieldset>
-                                </div>
-
-                                <fieldset class="fieldset">
-                                    <legend class="fieldset-legend">Project URL</legend>
-                                    <input class="input w-full @error('projects.' . $index . '.url') input-error @enderror" type="url" name="projects[{{ $index }}][url]" value="{{ $row['url'] ?? '' }}">
-                                    @error('projects.' . $index . '.url')
-                                        <p class="label text-error">{{ $message }}</p>
-                                    @enderror
-                                </fieldset>
-
-                                <fieldset class="fieldset">
-                                    <legend class="fieldset-legend">Description</legend>
-                                    <textarea class="textarea min-h-24 w-full @error('projects.' . $index . '.description') textarea-error @enderror" name="projects[{{ $index }}][description]" data-rich-text>{{ $row['description'] ?? '' }}</textarea>
-                                    @error('projects.' . $index . '.description')
-                                        <p class="label text-error">{{ $message }}</p>
-                                    @enderror
-                                </fieldset>
-
-                                <div class="flex flex-wrap gap-4 pt-2">
-                                    <label class="flex items-center gap-2 text-sm">
-                                        <input class="toggle toggle-sm" type="checkbox" name="projects[{{ $index }}][is_active]" value="1" @checked((bool) ($row['is_active'] ?? true))>
-                                        Active
-                                    </label>
-                                    @if ($row['id'])
-                                        <label class="flex items-center gap-2 text-sm text-error">
-                                            <input class="checkbox checkbox-sm" type="checkbox" name="projects[{{ $index }}][remove]" value="1" @checked((bool) ($row['remove'] ?? false))>
-                                            Remove
-                                        </label>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+                    @include('admin.homepage.partials.assignment-table', [
+                        'title' => 'Projects',
+                        'group' => 'projects',
+                        'rows' => $projectRows,
+                        'manageRoute' => route('admin.projects.index'),
+                        'emptyText' => 'Create projects before assigning them to this version.',
+                    ])
                 </div>
             </div>
 
@@ -344,49 +245,13 @@
                         @enderror
                     </fieldset>
 
-                    <div class="mt-4 space-y-5">
-                        @foreach ($experienceRows as $index => $row)
-                            <div class="rounded-box border border-base-300 p-4">
-                                <input type="hidden" name="experiences[{{ $index }}][id]" value="{{ $row['id'] }}">
-
-                                <div class="grid gap-4 lg:grid-cols-[6rem_1fr_1fr]">
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Order</legend>
-                                        <input class="input w-full @error('experiences.' . $index . '.sort_order') input-error @enderror" type="number" min="0" max="999" name="experiences[{{ $index }}][sort_order]" value="{{ $row['sort_order'] ?? $index + 1 }}">
-                                    </fieldset>
-
-                                    <fieldset class="fieldset">
-                                        <legend class="fieldset-legend">Title</legend>
-                                        <input class="input w-full @error('experiences.' . $index . '.title') input-error @enderror" type="text" name="experiences[{{ $index }}][title]" value="{{ $row['title'] ?? '' }}">
-                                        @error('experiences.' . $index . '.title')
-                                            <p class="label text-error">{{ $message }}</p>
-                                        @enderror
-                                    </fieldset>
-
-                                    <div class="flex items-end gap-4 pb-2">
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input class="toggle toggle-sm" type="checkbox" name="experiences[{{ $index }}][is_active]" value="1" @checked((bool) ($row['is_active'] ?? true))>
-                                            Active
-                                        </label>
-                                        @if ($row['id'])
-                                            <label class="flex items-center gap-2 text-sm text-error">
-                                                <input class="checkbox checkbox-sm" type="checkbox" name="experiences[{{ $index }}][remove]" value="1" @checked((bool) ($row['remove'] ?? false))>
-                                                Remove
-                                            </label>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <fieldset class="fieldset">
-                                    <legend class="fieldset-legend">Description</legend>
-                                    <textarea class="textarea min-h-24 w-full @error('experiences.' . $index . '.description') textarea-error @enderror" name="experiences[{{ $index }}][description]" data-rich-text>{{ $row['description'] ?? '' }}</textarea>
-                                    @error('experiences.' . $index . '.description')
-                                        <p class="label text-error">{{ $message }}</p>
-                                    @enderror
-                                </fieldset>
-                            </div>
-                        @endforeach
-                    </div>
+                    @include('admin.homepage.partials.assignment-table', [
+                        'title' => 'Experiences',
+                        'group' => 'experiences',
+                        'rows' => $experienceRows,
+                        'manageRoute' => route('admin.experiences.index'),
+                        'emptyText' => 'Create experiences before assigning them to this version.',
+                    ])
                 </div>
             </div>
 
@@ -446,40 +311,6 @@
             </div>
         </form>
 
-        <dialog id="image_picker_modal" class="modal" data-image-picker-modal data-url="{{ route('admin.homepage.images') }}">
-            <div class="modal-box max-w-5xl">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h2 class="text-xl font-semibold">Select image</h2>
-                    </div>
-                    <form method="dialog">
-                        <button class="btn btn-sm" type="submit">Close</button>
-                    </form>
-                </div>
-
-                <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <label class="flex items-center gap-2 text-sm">
-                        <input class="checkbox checkbox-sm" type="checkbox" data-image-picker-header-filter>
-                        Header images only
-                    </label>
-                    <a class="btn btn-sm" href="{{ route('admin.images.create') }}">Upload image</a>
-                </div>
-
-                <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-image-picker-results>
-                    <div class="col-span-full text-sm text-base-content/70">Loading images.</div>
-                </div>
-
-                <div class="modal-action justify-between">
-                    <button class="btn" type="button" data-image-picker-clear>Use placeholder</button>
-                    <div class="join">
-                        <button class="btn join-item" type="button" data-image-picker-prev>Previous</button>
-                        <button class="btn join-item" type="button" data-image-picker-next>Next</button>
-                    </div>
-                </div>
-            </div>
-            <form method="dialog" class="modal-backdrop">
-                <button>close</button>
-            </form>
-        </dialog>
+        @include('admin.images.partials.picker-modal')
     </section>
 @endsection

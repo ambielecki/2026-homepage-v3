@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable([
     'name',
@@ -67,51 +67,63 @@ class Homepage extends Model
     }
 
     /**
-     * @return HasMany<HomepageExpertiseCard, Homepage>
+     * @return BelongsToMany<HomepageExpertiseCard, Homepage>
      */
-    public function expertiseCards(): HasMany
+    public function expertiseCards(): BelongsToMany
     {
-        return $this->hasMany(HomepageExpertiseCard::class)->orderBy('sort_order')->orderBy('id');
+        return $this->belongsToMany(HomepageExpertiseCard::class, 'homepage_expertise_card_assignments')
+            ->withPivot(['sort_order', 'is_active'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order')
+            ->orderBy('homepage_expertise_cards.id');
     }
 
     /**
-     * @return HasMany<HomepageExpertiseCard, Homepage>
+     * @return BelongsToMany<HomepageExpertiseCard, Homepage>
      */
-    public function activeExpertiseCards(): HasMany
+    public function activeExpertiseCards(): BelongsToMany
     {
-        return $this->expertiseCards()->where('is_active', true);
+        return $this->expertiseCards()->wherePivot('is_active', true);
     }
 
     /**
-     * @return HasMany<HomepageProject, Homepage>
+     * @return BelongsToMany<HomepageProject, Homepage>
      */
-    public function projects(): HasMany
+    public function projects(): BelongsToMany
     {
-        return $this->hasMany(HomepageProject::class)->orderBy('sort_order')->orderBy('id');
+        return $this->belongsToMany(HomepageProject::class, 'homepage_project_assignments')
+            ->withPivot(['sort_order', 'is_active'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order')
+            ->orderBy('homepage_projects.id');
     }
 
     /**
-     * @return HasMany<HomepageProject, Homepage>
+     * @return BelongsToMany<HomepageProject, Homepage>
      */
-    public function activeProjects(): HasMany
+    public function activeProjects(): BelongsToMany
     {
-        return $this->projects()->where('is_active', true);
+        return $this->projects()->wherePivot('is_active', true);
     }
 
     /**
-     * @return HasMany<HomepageExperience, Homepage>
+     * @return BelongsToMany<HomepageExperience, Homepage>
      */
-    public function experiences(): HasMany
+    public function experiences(): BelongsToMany
     {
-        return $this->hasMany(HomepageExperience::class)->orderBy('sort_order')->orderBy('id');
+        return $this->belongsToMany(HomepageExperience::class, 'homepage_experience_assignments')
+            ->withPivot(['sort_order', 'is_active'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order')
+            ->orderBy('homepage_experiences.id');
     }
 
     /**
-     * @return HasMany<HomepageExperience, Homepage>
+     * @return BelongsToMany<HomepageExperience, Homepage>
      */
-    public function activeExperiences(): HasMany
+    public function activeExperiences(): BelongsToMany
     {
-        return $this->experiences()->where('is_active', true);
+        return $this->experiences()->wherePivot('is_active', true);
     }
 
     public static function defaultContent(): self

@@ -9,15 +9,13 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable([
-    'homepage_id',
     'image_id',
     'title',
     'url',
     'description',
-    'sort_order',
-    'is_active',
 ])]
 class HomepageProject extends Model
 {
@@ -30,17 +28,18 @@ class HomepageProject extends Model
     protected function casts(): array
     {
         return [
-            'sort_order' => 'integer',
-            'is_active' => 'boolean',
+            'image_id' => 'integer',
         ];
     }
 
     /**
-     * @return BelongsTo<Homepage, HomepageProject>
+     * @return BelongsToMany<Homepage, HomepageProject>
      */
-    public function homepage(): BelongsTo
+    public function homepages(): BelongsToMany
     {
-        return $this->belongsTo(Homepage::class);
+        return $this->belongsToMany(Homepage::class, 'homepage_project_assignments')
+            ->withPivot(['sort_order', 'is_active'])
+            ->withTimestamps();
     }
 
     /**

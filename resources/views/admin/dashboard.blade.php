@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <h2 class="card-title text-base">Content</h2>
                     <p class="text-sm leading-6 text-base-content/70">
-                        Manage homepage versions, section copy, repeatable cards, hobby projects, and contact links.
+                        Manage homepage versions, section copy, entity assignments, and contact links.
                     </p>
                     <div class="card-actions justify-end">
                         <a class="btn btn-sm" href="{{ route('admin.homepage.index') }}">Manage homepage</a>
@@ -30,27 +30,44 @@
                 <div class="card-body">
                     <h2 class="card-title text-base">Projects</h2>
                     <p class="text-sm leading-6 text-base-content/70">
-                        Hobby project descriptions and screenshots are edited inside each homepage version.
+                        Manage reusable hobby project descriptions, screenshots, and links.
                     </p>
+                    <div class="card-actions justify-end">
+                        <a class="btn btn-sm" href="{{ route('admin.projects.index') }}">Manage Projects</a>
+                    </div>
+                </div>
+            </article>
+            <article class="card card-border bg-base-100">
+                <div class="card-body">
+                    <h2 class="card-title text-base">Expertise</h2>
+                    <p class="text-sm leading-6 text-base-content/70">
+                        Manage reusable expertise cards and assign them to homepage versions.
+                    </p>
+                    <div class="card-actions justify-end">
+                        <a class="btn btn-sm" href="{{ route('admin.expertise.index') }}">Manage expertise</a>
+                    </div>
+                </div>
+            </article>
+            <article class="card card-border bg-base-100">
+                <div class="card-body">
+                    <h2 class="card-title text-base">Experiences</h2>
+                    <p class="text-sm leading-6 text-base-content/70">
+                        Manage reusable experience cards and assign them to homepage versions.
+                    </p>
+                    <div class="card-actions justify-end">
+                        <a class="btn btn-sm" href="{{ route('admin.experiences.index') }}">Manage experiences</a>
+                    </div>
                 </div>
             </article>
             <article class="card card-border bg-base-100">
                 <div class="card-body">
                     <h2 class="card-title text-base">Images</h2>
                     <p class="text-sm leading-6 text-base-content/70">
-                        Upload original images and generate web optimized sizes for future homepage sections.
+                        Upload original images and generate web optimized sizes for homepage sections.
                     </p>
                     <div class="card-actions justify-end">
                         <a class="btn btn-sm" href="{{ route('admin.images.index') }}">Manage images</a>
                     </div>
-                </div>
-            </article>
-            <article class="card card-border bg-base-100">
-                <div class="card-body">
-                    <h2 class="card-title text-base">Session</h2>
-                    <p class="text-sm leading-6 text-base-content/70">
-                        Use the logout action in the navigation when admin work is complete.
-                    </p>
                 </div>
             </article>
         </div>

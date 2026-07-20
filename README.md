@@ -20,6 +20,8 @@ This repository contains the Laravel application for [andrewbielecki.com](https:
 - Database-backed homepage versions for hero, expertise, hobby projects, experience, and contact content
 - Active/draft homepage publishing workflow in the admin area
 - Authenticated previews for any homepage version before publishing
+- Reusable admin-managed Projects, Expertise, and Experiences assigned per homepage version
+- Inactive homepage version deletion with confirmation
 - Session-authenticated admin dashboard at `/admin`
 - Command-line admin user creation and password reset commands
 - Admin image uploads with original file storage and generated WebP sizes
