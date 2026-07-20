@@ -138,6 +138,13 @@ test('the homepage renders the active database version and hides inactive rows',
         ->assertSee('<a href="https://showmyrides.com">ShowMyRides</a>', false)
         ->assertSee('href="#expertise"', false)
         ->assertSee('href="#projects"', false)
+        ->assertSee('href="#experience"', false)
+        ->assertSeeInOrder([
+            'href="#expertise"',
+            'href="#projects"',
+            'href="#experience"',
+            'href="#contact"',
+        ], false)
         ->assertSee('[&amp;_a]:text-blue-600', false)
         ->assertSee('text-base-content/85', false)
         ->assertSee('Project screenshot alt text')
@@ -181,6 +188,7 @@ test('the homepage hides disabled optional sections for the active version', fun
         ->assertDontSee('id="expertise"', false)
         ->assertDontSee('id="experience"', false)
         ->assertDontSee('href="#expertise"', false)
+        ->assertDontSee('href="#experience"', false)
         ->assertDontSee('Hidden expertise section title')
         ->assertDontSee('Hidden expertise card')
         ->assertDontSee('Hidden experience section title')
