@@ -9,7 +9,9 @@ use App\Http\Requests\StoreImageRequest;
 use App\Http\Requests\UpdateImageRequest;
 use App\Models\Image as HomepageImage;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -33,6 +35,30 @@ class ImageController extends Controller
     public function create(): View
     {
         return view('admin.images.create');
+    }
+
+    public function picker(Request $request): JsonResponse
+    {
+        $images = HomepageImage::query()
+            ->when($request->boolean('header_only'), fn ($query) => $query->where('is_header', true))
+            ->latest()
+            ->paginate(9);
+
+        return response()->json([
+            'images' => $images->getCollection()->map(fn (HomepageImage $image): array => [
+                'id' => $image->id,
+                'alt_text' => $image->alt_text,
+                'description' => $image->description,
+                'is_header' => $image->is_header,
+                'thumbnail_url' => $image->thumbnailUrl(),
+            ])->values(),
+            'pagination' => [
+                'current_page' => $images->currentPage(),
+                'last_page' => $images->lastPage(),
+                'next_page_url' => $images->nextPageUrl(),
+                'previous_page_url' => $images->previousPageUrl(),
+            ],
+        ]);
     }
 
     public function store(StoreImageRequest $request): RedirectResponse

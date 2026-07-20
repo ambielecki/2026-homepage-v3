@@ -64,6 +64,8 @@ test('authenticated admins can view the dashboard', function (): void {
     $response
         ->assertOk()
         ->assertSee('Homepage dashboard')
+        ->assertSee('href="/"', false)
+        ->assertSee('Live')
         ->assertSee('Logout');
 });
 
