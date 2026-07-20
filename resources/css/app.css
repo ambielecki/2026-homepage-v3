@@ -3,9 +3,11 @@
 @source "../**/*.blade.php";
 @source "../**/*.js";
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
-@source "../../storage/framework/views/*.php";
 
-@plugin "daisyui";
+@plugin "daisyui" {
+  include: alert, badge, button, card, checkbox, fieldset, input, join, label, link, menu, mockup, modal, navbar, table, textarea, toggle;
+  logs: false;
+}
 @plugin "daisyui/theme" {
   name: "bielecki";
   default: true;
