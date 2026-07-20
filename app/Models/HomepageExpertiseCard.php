@@ -8,14 +8,11 @@ use Database\Factories\HomepageExpertiseCardFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable([
-    'homepage_id',
     'title',
     'description',
-    'sort_order',
-    'is_active',
 ])]
 class HomepageExpertiseCard extends Model
 {
@@ -23,21 +20,12 @@ class HomepageExpertiseCard extends Model
     use HasFactory;
 
     /**
-     * @return array<string, string>
+     * @return BelongsToMany<Homepage, HomepageExpertiseCard>
      */
-    protected function casts(): array
+    public function homepages(): BelongsToMany
     {
-        return [
-            'sort_order' => 'integer',
-            'is_active' => 'boolean',
-        ];
-    }
-
-    /**
-     * @return BelongsTo<Homepage, HomepageExpertiseCard>
-     */
-    public function homepage(): BelongsTo
-    {
-        return $this->belongsTo(Homepage::class);
+        return $this->belongsToMany(Homepage::class, 'homepage_expertise_card_assignments')
+            ->withPivot(['sort_order', 'is_active'])
+            ->withTimestamps();
     }
 }

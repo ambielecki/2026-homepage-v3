@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateHomepageRequest;
 use App\Models\Homepage;
+use App\Models\HomepageExperience;
+use App\Models\HomepageExpertiseCard;
+use App\Models\HomepageProject;
 use App\Models\Image;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -53,6 +55,9 @@ class HomepageController extends Controller
 
         return view('admin.homepage.edit', [
             'homepage' => $homepage,
+            'expertiseCards' => HomepageExpertiseCard::query()->orderBy('title')->get(),
+            'projects' => HomepageProject::query()->with('image')->orderBy('title')->get(),
+            'experiences' => HomepageExperience::query()->orderBy('title')->get(),
             'images' => $images,
         ]);
     }
@@ -86,21 +91,18 @@ class HomepageController extends Controller
                 $homepage,
                 'expertiseCards',
                 $validated['expertise_cards'] ?? [],
-                ['title', 'description', 'sort_order', 'is_active'],
             );
 
             $this->syncRepeatableItems(
                 $homepage,
                 'projects',
                 $validated['projects'] ?? [],
-                ['image_id', 'title', 'url', 'description', 'sort_order', 'is_active'],
             );
 
             $this->syncRepeatableItems(
                 $homepage,
                 'experiences',
                 $validated['experiences'] ?? [],
-                ['title', 'description', 'sort_order', 'is_active'],
             );
 
             return $homepage;
@@ -136,17 +138,9 @@ class HomepageController extends Controller
             $clone->is_active = false;
             $clone->save();
 
-            foreach ($homepage->expertiseCards as $card) {
-                $clone->expertiseCards()->create($card->only(['title', 'description', 'sort_order', 'is_active']));
-            }
-
-            foreach ($homepage->projects as $project) {
-                $clone->projects()->create($project->only(['image_id', 'title', 'url', 'description', 'sort_order', 'is_active']));
-            }
-
-            foreach ($homepage->experiences as $experience) {
-                $clone->experiences()->create($experience->only(['title', 'description', 'sort_order', 'is_active']));
-            }
+            $this->copyAssignments($homepage, $clone, 'expertiseCards');
+            $this->copyAssignments($homepage, $clone, 'projects');
+            $this->copyAssignments($homepage, $clone, 'experiences');
 
             return $clone;
         });
@@ -156,90 +150,72 @@ class HomepageController extends Controller
             ->with('status', 'Homepage version duplicated.');
     }
 
+    public function destroy(Homepage $homepage): RedirectResponse
+    {
+        if ($homepage->is_active) {
+            return redirect()
+                ->route('admin.homepage.index')
+                ->with('status', 'The active homepage version cannot be deleted. Activate another version first.');
+        }
+
+        $homepage->delete();
+
+        return redirect()
+            ->route('admin.homepage.index')
+            ->with('status', 'Homepage version deleted.');
+    }
+
     private function createDefaultRows(Homepage $homepage): void
     {
         foreach (Homepage::defaultExpertiseCards() as $attributes) {
-            $homepage->expertiseCards()->create($attributes);
+            $card = HomepageExpertiseCard::query()->create(Arr::except($attributes, ['sort_order', 'is_active']));
+            $homepage->expertiseCards()->attach($card, Arr::only($attributes, ['sort_order', 'is_active']));
         }
 
         foreach (Homepage::defaultProjects() as $attributes) {
-            $homepage->projects()->create($attributes);
+            $project = HomepageProject::query()->create(Arr::except($attributes, ['sort_order', 'is_active']));
+            $homepage->projects()->attach($project, Arr::only($attributes, ['sort_order', 'is_active']));
         }
 
         foreach (Homepage::defaultExperiences() as $attributes) {
-            $homepage->experiences()->create($attributes);
+            $experience = HomepageExperience::query()->create(Arr::except($attributes, ['sort_order', 'is_active']));
+            $homepage->experiences()->attach($experience, Arr::only($attributes, ['sort_order', 'is_active']));
         }
     }
 
     /**
      * @param  array<int, array<string, mixed>>  $rows
-     * @param  array<int, string>  $fields
      */
-    private function syncRepeatableItems(Homepage $homepage, string $relation, array $rows, array $fields): void
+    private function syncRepeatableItems(Homepage $homepage, string $relation, array $rows): void
     {
-        $query = $homepage->{$relation}();
-        $existingIds = $query->pluck('id')->map(fn (int $id): int => $id)->all();
+        $assignments = [];
 
         foreach ($rows as $row) {
-            $id = filled($row['id'] ?? null) ? (int) $row['id'] : null;
-
-            if ($this->booleanValue($row['remove'] ?? false)) {
-                if ($id !== null && in_array($id, $existingIds, true)) {
-                    $query->whereKey($id)->delete();
-                }
-
+            if (blank($row['id'] ?? null)) {
                 continue;
             }
 
-            if (! $this->hasRepeatableContent($row)) {
-                continue;
-            }
-
-            $payload = $this->repeatablePayload($row, $fields);
-
-            if ($id !== null && in_array($id, $existingIds, true)) {
-                /** @var Model $item */
-                $item = $query->whereKey($id)->firstOrFail();
-                $item->update($payload);
-
-                continue;
-            }
-
-            $query->create($payload);
-        }
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     */
-    private function hasRepeatableContent(array $row): bool
-    {
-        return filled($row['id'] ?? null)
-            || filled($row['title'] ?? null)
-            || filled($row['url'] ?? null)
-            || filled($row['description'] ?? null)
-            || filled($row['image_id'] ?? null);
-    }
-
-    /**
-     * @param  array<string, mixed>  $row
-     * @param  array<int, string>  $fields
-     * @return array<string, mixed>
-     */
-    private function repeatablePayload(array $row, array $fields): array
-    {
-        $payload = [];
-
-        foreach ($fields as $field) {
-            $payload[$field] = match ($field) {
-                'is_active' => $this->booleanValue($row[$field] ?? false),
-                'sort_order' => (int) ($row[$field] ?? 0),
-                'image_id' => filled($row[$field] ?? null) ? (int) $row[$field] : null,
-                default => $row[$field] ?? '',
-            };
+            $assignments[(int) $row['id']] = [
+                'sort_order' => (int) ($row['sort_order'] ?? 0),
+                'is_active' => $this->booleanValue($row['is_active'] ?? false),
+            ];
         }
 
-        return $payload;
+        $homepage->{$relation}()->sync($assignments);
+    }
+
+    private function copyAssignments(Homepage $source, Homepage $target, string $relation): void
+    {
+        $assignments = [];
+
+        foreach ($source->{$relation} as $item) {
+            $assignments[$item->id] = [
+                'sort_order' => $item->pivot->sort_order,
+                'is_active' => $item->pivot->is_active,
+            ];
+        }
+
+        $target->{$relation}()->sync($assignments);
     }
 
     private function booleanValue(mixed $value): bool

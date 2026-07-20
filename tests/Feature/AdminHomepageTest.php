@@ -14,10 +14,20 @@ uses(RefreshDatabase::class);
 
 test('homepage admin routes require authentication', function (): void {
     $homepage = Homepage::factory()->create();
+    $project = HomepageProject::factory()->create();
+    $experience = HomepageExperience::factory()->create();
+    $expertise = HomepageExpertiseCard::factory()->create();
 
     $this->get('/admin/homepage')->assertRedirect('/login');
     $this->get(sprintf('/admin/homepage/%s/edit', $homepage->id))->assertRedirect('/login');
     $this->get(sprintf('/admin/homepage/%s/preview', $homepage->id))->assertRedirect('/login');
+    $this->delete(sprintf('/admin/homepage/%s', $homepage->id))->assertRedirect('/login');
+    $this->get('/admin/projects')->assertRedirect('/login');
+    $this->get(sprintf('/admin/projects/%s/edit', $project->id))->assertRedirect('/login');
+    $this->get('/admin/experiences')->assertRedirect('/login');
+    $this->get(sprintf('/admin/experiences/%s/edit', $experience->id))->assertRedirect('/login');
+    $this->get('/admin/expertise')->assertRedirect('/login');
+    $this->get(sprintf('/admin/expertise/%s/edit', $expertise->id))->assertRedirect('/login');
 });
 
 test('authenticated admins can view homepage versions', function (): void {
@@ -38,23 +48,39 @@ test('authenticated admins can view homepage versions', function (): void {
         ->assertSee('Draft homepage')
         ->assertSee('Active')
         ->assertSee('Preview')
+        ->assertSee('Delete')
         ->assertSee('Create draft');
 });
 
-test('authenticated admins can edit homepage project urls', function (): void {
+test('authenticated admins can reach new admin navigation links', function (): void {
     $user = User::factory()->create();
-    $homepage = Homepage::factory()->create();
-    HomepageProject::factory()->for($homepage)->create([
+
+    $response = $this->actingAs($user)->get('/admin');
+
+    $response
+        ->assertOk()
+        ->assertSee('href="/"', false)
+        ->assertSee('Live')
+        ->assertSee(route('admin.projects.index'))
+        ->assertSee(route('admin.experiences.index'))
+        ->assertSee(route('admin.expertise.index'))
+        ->assertSee('Manage Projects')
+        ->assertDontSee('Session');
+});
+
+test('authenticated admins can edit project urls in the project section', function (): void {
+    $user = User::factory()->create();
+    $project = HomepageProject::factory()->create([
         'title' => 'ShowMyRides',
         'url' => 'https://showmyrides.com',
     ]);
 
-    $response = $this->actingAs($user)->get(route('admin.homepage.edit', $homepage));
+    $response = $this->actingAs($user)->get(route('admin.projects.edit', $project));
 
     $response
         ->assertOk()
         ->assertSee('Project URL')
-        ->assertSee('name="projects[0][url]"', false)
+        ->assertSee('name="url"', false)
         ->assertSee('value="https://showmyrides.com"', false);
 });
 
@@ -69,9 +95,12 @@ test('authenticated admins can preview any homepage version without activating i
         'hero_title' => 'Draft homepage title',
         'hero_description' => 'Draft homepage description.',
     ]);
-    HomepageExpertiseCard::factory()->for($draft)->create([
+    $expertise = HomepageExpertiseCard::factory()->create([
         'title' => 'Draft expertise',
         'description' => 'Draft expertise description.',
+    ]);
+    $draft->expertiseCards()->attach($expertise, [
+        'sort_order' => 1,
         'is_active' => true,
     ]);
 
@@ -90,7 +119,7 @@ test('authenticated admins can preview any homepage version without activating i
         ->and($draft->fresh()->is_active)->toBeFalse();
 });
 
-test('authenticated admins can create a draft homepage version with default rows', function (): void {
+test('authenticated admins can create a draft homepage version with default assignments', function (): void {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/admin/homepage');
@@ -102,18 +131,32 @@ test('authenticated admins can create a draft homepage version with default rows
         ->assertSessionHas('status', 'Homepage draft created.');
 
     expect($homepage->is_active)->toBeFalse()
+        ->and(HomepageExpertiseCard::query()->count())->toBe(3)
+        ->and(HomepageProject::query()->count())->toBe(3)
+        ->and(HomepageExperience::query()->count())->toBe(4)
         ->and($homepage->expertiseCards()->count())->toBe(3)
         ->and($homepage->projects()->count())->toBe(3)
         ->and($homepage->experiences()->count())->toBe(4);
 });
 
-test('authenticated admins can save homepage edits as a new draft version', function (): void {
+test('authenticated admins can save homepage edits as a new draft version with assignments', function (): void {
     $user = User::factory()->create();
     $homepage = Homepage::factory()->create();
-    $expertise = HomepageExpertiseCard::factory()->for($homepage)->create();
-    $project = HomepageProject::factory()->for($homepage)->create();
-    $experience = HomepageExperience::factory()->for($homepage)->create();
+    $expertise = HomepageExpertiseCard::factory()->create([
+        'title' => 'Existing expertise',
+    ]);
+    $inactiveExpertise = HomepageExpertiseCard::factory()->create([
+        'title' => 'Inactive expertise',
+    ]);
+    $project = HomepageProject::factory()->create([
+        'url' => 'https://showmyrides.com',
+    ]);
+    $experience = HomepageExperience::factory()->create();
     $image = Image::factory()->create();
+
+    $homepage->expertiseCards()->attach($expertise, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->projects()->attach($project, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->experiences()->attach($experience, ['sort_order' => 1, 'is_active' => true]);
 
     $response = $this->actingAs($user)->put(route('admin.homepage.update', $homepage), [
         'name' => 'Updated homepage',
@@ -137,28 +180,17 @@ test('authenticated admins can save homepage edits as a new draft version', func
         'expertise_cards' => [
             [
                 'id' => $expertise->id,
-                'title' => 'Updated expertise',
-                'description' => 'Updated expertise description.',
                 'sort_order' => 2,
                 'is_active' => '1',
             ],
             [
-                'title' => 'New expertise',
-                'description' => 'New expertise description.',
+                'id' => $inactiveExpertise->id,
                 'sort_order' => 1,
-                'is_active' => '1',
             ],
         ],
         'projects' => [
             [
                 'id' => $project->id,
-                'remove' => '1',
-            ],
-            [
-                'image_id' => $image->id,
-                'title' => 'New project',
-                'url' => 'https://showmyrides.com',
-                'description' => 'New project description.',
                 'sort_order' => 1,
                 'is_active' => '1',
             ],
@@ -166,8 +198,6 @@ test('authenticated admins can save homepage edits as a new draft version', func
         'experiences' => [
             [
                 'id' => $experience->id,
-                'title' => 'Updated experience',
-                'description' => 'Updated experience description.',
                 'sort_order' => 1,
             ],
         ],
@@ -180,18 +210,22 @@ test('authenticated admins can save homepage edits as a new draft version', func
         ->where('name', 'Updated homepage')
         ->firstOrFail();
 
+    $activeExpertise = $newHomepage->expertiseCards()->whereKey($expertise->id)->firstOrFail();
+    $inactiveAssignedExpertise = $newHomepage->expertiseCards()->whereKey($inactiveExpertise->id)->firstOrFail();
+    $assignedProject = $newHomepage->projects()->whereKey($project->id)->firstOrFail();
+    $inactiveExperience = $newHomepage->experiences()->whereKey($experience->id)->firstOrFail();
+
     $response->assertRedirect(route('admin.homepage.edit', $newHomepage));
 
     expect($homepage->fresh()->name)->not->toBe('Updated homepage')
         ->and($newHomepage->is_active)->toBeFalse()
         ->and($newHomepage->hero_image_id)->toBe($image->id)
         ->and($newHomepage->github_url)->toBe('https://github.com/andrewbielecki')
-        ->and($newHomepage->expertiseCards()->where('title', 'Updated expertise')->exists())->toBeTrue()
-        ->and($newHomepage->expertiseCards()->where('title', 'New expertise')->exists())->toBeTrue()
-        ->and($newHomepage->projects()->whereKey($project->id)->exists())->toBeFalse()
-        ->and($newHomepage->projects()->where('title', 'New project')->exists())->toBeTrue()
-        ->and($newHomepage->projects()->where('url', 'https://showmyrides.com')->exists())->toBeTrue()
-        ->and($newHomepage->experiences()->firstOrFail()->is_active)->toBeFalse();
+        ->and((int) $activeExpertise->pivot->sort_order)->toBe(2)
+        ->and((bool) $activeExpertise->pivot->is_active)->toBeTrue()
+        ->and((bool) $inactiveAssignedExpertise->pivot->is_active)->toBeFalse()
+        ->and($assignedProject->url)->toBe('https://showmyrides.com')
+        ->and((bool) $inactiveExperience->pivot->is_active)->toBeFalse();
 });
 
 test('authenticated admins can save a homepage without contact description text', function (): void {
@@ -244,35 +278,118 @@ test('authenticated admins can activate one homepage version', function (): void
         ->and($draft->fresh()->is_active)->toBeTrue();
 });
 
-test('authenticated admins can duplicate a homepage version', function (): void {
+test('authenticated admins can duplicate a homepage version with assignments', function (): void {
     $user = User::factory()->create();
     $homepage = Homepage::factory()->active()->create([
         'name' => 'Original version',
     ]);
-    HomepageExpertiseCard::factory()->for($homepage)->create([
+    $expertise = HomepageExpertiseCard::factory()->create([
         'title' => 'Copied expertise',
     ]);
-    HomepageProject::factory()->for($homepage)->create([
+    $project = HomepageProject::factory()->create([
         'title' => 'Copied project',
         'url' => 'https://showmyrides.com',
     ]);
-    HomepageExperience::factory()->for($homepage)->create([
+    $experience = HomepageExperience::factory()->create([
         'title' => 'Copied experience',
     ]);
+
+    $homepage->expertiseCards()->attach($expertise, ['sort_order' => 2, 'is_active' => true]);
+    $homepage->projects()->attach($project, ['sort_order' => 1, 'is_active' => true]);
+    $homepage->experiences()->attach($experience, ['sort_order' => 3, 'is_active' => false]);
 
     $response = $this->actingAs($user)->post(route('admin.homepage.duplicate', $homepage));
 
     $clone = Homepage::query()->where('name', 'Original version copy')->firstOrFail();
+    $copiedExperience = $clone->experiences()->whereKey($experience->id)->firstOrFail();
 
     $response
         ->assertRedirect(route('admin.homepage.edit', $clone))
         ->assertSessionHas('status', 'Homepage version duplicated.');
 
     expect($clone->is_active)->toBeFalse()
-        ->and($clone->expertiseCards()->where('title', 'Copied expertise')->exists())->toBeTrue()
-        ->and($clone->projects()->where('title', 'Copied project')->exists())->toBeTrue()
+        ->and($clone->expertiseCards()->whereKey($expertise->id)->exists())->toBeTrue()
+        ->and($clone->projects()->whereKey($project->id)->exists())->toBeTrue()
         ->and($clone->projects()->where('url', 'https://showmyrides.com')->exists())->toBeTrue()
-        ->and($clone->experiences()->where('title', 'Copied experience')->exists())->toBeTrue();
+        ->and((int) $copiedExperience->pivot->sort_order)->toBe(3)
+        ->and((bool) $copiedExperience->pivot->is_active)->toBeFalse()
+        ->and(HomepageProject::query()->where('title', 'Copied project')->count())->toBe(1);
+});
+
+test('authenticated admins can delete inactive homepage versions only', function (): void {
+    $user = User::factory()->create();
+    $active = Homepage::factory()->active()->create();
+    $draft = Homepage::factory()->create();
+    $project = HomepageProject::factory()->create();
+    $draft->projects()->attach($project, ['sort_order' => 1, 'is_active' => true]);
+
+    $activeResponse = $this->actingAs($user)->delete(route('admin.homepage.destroy', $active));
+
+    $activeResponse
+        ->assertRedirect(route('admin.homepage.index'))
+        ->assertSessionHas('status', 'The active homepage version cannot be deleted. Activate another version first.');
+
+    expect($active->fresh())->not->toBeNull();
+
+    $draftResponse = $this->actingAs($user)->delete(route('admin.homepage.destroy', $draft));
+
+    $draftResponse
+        ->assertRedirect(route('admin.homepage.index'))
+        ->assertSessionHas('status', 'Homepage version deleted.');
+
+    expect($draft->fresh())->toBeNull()
+        ->and($project->fresh())->not->toBeNull();
+});
+
+test('authenticated admins can manage reusable homepage entities', function (): void {
+    $user = User::factory()->create();
+    $image = Image::factory()->create();
+
+    $projectResponse = $this->actingAs($user)->post(route('admin.projects.store'), [
+        'image_id' => $image->id,
+        'title' => 'ShowMyRides',
+        'url' => 'https://showmyrides.com',
+        'description' => 'Vehicle showcase project.',
+    ]);
+    $project = HomepageProject::query()->where('title', 'ShowMyRides')->firstOrFail();
+
+    $projectResponse
+        ->assertRedirect(route('admin.projects.edit', $project))
+        ->assertSessionHas('status', 'Project created.');
+
+    $this->actingAs($user)
+        ->put(route('admin.projects.update', $project), [
+            'image_id' => null,
+            'title' => 'ShowMyRides updated',
+            'url' => 'https://showmyrides.com',
+            'description' => 'Updated project description.',
+        ])
+        ->assertRedirect(route('admin.projects.edit', $project))
+        ->assertSessionHas('status', 'Project updated.');
+
+    $expertiseResponse = $this->actingAs($user)->post(route('admin.expertise.store'), [
+        'title' => 'Backend architecture',
+        'description' => 'Reusable expertise card.',
+    ]);
+    $expertise = HomepageExpertiseCard::query()->where('title', 'Backend architecture')->firstOrFail();
+
+    $expertiseResponse
+        ->assertRedirect(route('admin.expertise.edit', $expertise))
+        ->assertSessionHas('status', 'Expertise card created.');
+
+    $experienceResponse = $this->actingAs($user)->post(route('admin.experiences.store'), [
+        'title' => 'Lead engineering',
+        'description' => 'Reusable experience card.',
+    ]);
+    $experience = HomepageExperience::query()->where('title', 'Lead engineering')->firstOrFail();
+
+    $experienceResponse
+        ->assertRedirect(route('admin.experiences.edit', $experience))
+        ->assertSessionHas('status', 'Experience created.');
+
+    expect($project->fresh()->title)->toBe('ShowMyRides updated')
+        ->and($expertise->fresh())->not->toBeNull()
+        ->and($experience->fresh())->not->toBeNull();
 });
 
 test('authenticated admins can fetch paginated image picker results with header filtering', function (): void {

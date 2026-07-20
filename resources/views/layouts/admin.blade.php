@@ -11,18 +11,21 @@
     </head>
     <body class="min-h-screen bg-base-100 text-base-content antialiased">
         <header class="border-b border-base-300 bg-base-100/95">
-            <nav class="navbar mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Admin navigation">
-                <div class="navbar-start">
+            <nav class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8" aria-label="Admin navigation">
+                <div>
                     <a class="text-sm font-semibold sm:text-base" href="{{ route('admin.dashboard') }}">
                         Andrew Bielecki Admin
                     </a>
                 </div>
 
-                <div class="navbar-end">
+                <div>
                     @auth
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap gap-2">
                             <a class="btn btn-sm btn-ghost" href="/">Live</a>
                             <a class="btn btn-sm btn-ghost" href="{{ route('admin.homepage.index') }}">Homepage</a>
+                            <a class="btn btn-sm btn-ghost" href="{{ route('admin.projects.index') }}">Projects</a>
+                            <a class="btn btn-sm btn-ghost" href="{{ route('admin.experiences.index') }}">Experiences</a>
+                            <a class="btn btn-sm btn-ghost" href="{{ route('admin.expertise.index') }}">Expertise</a>
                             <a class="btn btn-sm btn-ghost" href="{{ route('admin.images.index') }}">Images</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

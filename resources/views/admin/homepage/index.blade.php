@@ -79,8 +79,33 @@
                                                 @csrf
                                                 <button class="btn btn-sm btn-primary" type="submit">Activate</button>
                                             </form>
+                                            <button class="btn btn-sm btn-error" type="button" onclick="document.getElementById('delete_homepage_{{ $homepage->id }}').showModal()">Delete</button>
                                         @endunless
                                     </div>
+
+                                    @unless ($homepage->is_active)
+                                        <dialog id="delete_homepage_{{ $homepage->id }}" class="modal">
+                                            <div class="modal-box">
+                                                <h2 class="text-lg font-semibold">Delete homepage version?</h2>
+                                                <p class="mt-3 text-sm leading-6 text-base-content/70">
+                                                    This will delete {{ $homepage->name }} and remove its content assignments. Reusable Projects, Experiences, and Expertise records will remain.
+                                                </p>
+                                                <div class="modal-action">
+                                                    <form method="dialog">
+                                                        <button class="btn" type="submit">Cancel</button>
+                                                    </form>
+                                                    <form method="POST" action="{{ route('admin.homepage.destroy', $homepage) }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-error" type="submit">Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <form method="dialog" class="modal-backdrop">
+                                                <button>close</button>
+                                            </form>
+                                        </dialog>
+                                    @endunless
                                 </td>
                             </tr>
                         @endforeach
