@@ -75,11 +75,14 @@
 
                 <div class="navbar-end">
                     <ul class="menu menu-horizontal gap-1 px-0 text-sm">
+                        @if ($showExpertiseSection)
+                            <li><a href="#expertise">Expertise</a></li>
+                        @endif
                         @if ($showProjectsSection)
                             <li><a href="#projects">Projects</a></li>
                         @endif
-                        @if ($showExpertiseSection)
-                            <li><a href="#expertise">Expertise</a></li>
+                        @if ($showExperienceSection)
+                            <li><a href="#experience">Experience</a></li>
                         @endif
                         <li><a href="#contact">Contact</a></li>
                     </ul>
