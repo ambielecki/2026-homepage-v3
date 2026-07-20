@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Code brackets</title>
+  <rect width="512" height="512" rx="96" fill="#0f172a"/>
+  <path d="M194 160 106 256l88 96" fill="none" stroke="#67e8f9" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M318 160l88 96-88 96" fill="none" stroke="#67e8f9" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M286 140 226 372" fill="none" stroke="#fbbf24" stroke-width="42" stroke-linecap="round"/>
+</svg>

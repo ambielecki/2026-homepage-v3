@@ -19,6 +19,8 @@
 
         <title>Andrew Bielecki | {{ $homepage->hero_headline }}</title>
 
+        <x-favicons />
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-base-100 text-base-content antialiased">
