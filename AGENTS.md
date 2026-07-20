@@ -47,6 +47,7 @@ necessary PHP commands should be run in the docker container by using `docker ex
 - use daisyUI for components
 - use the daisyUI skill when working with the UI
 - create reusable blade components when appropriate
+- add new daisyUI components to the resources/css/app.css file where needed 
 
 ## README.md conventions
 - This site will be hosted at https://www.andrewbielecki.com
