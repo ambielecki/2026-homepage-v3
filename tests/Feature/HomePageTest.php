@@ -71,7 +71,8 @@ test('the homepage renders the active database version and hides inactive rows',
     HomepageProject::factory()->for($homepage)->create([
         'image_id' => $projectImage->id,
         'title' => 'Active hobby project',
-        'description' => 'Visible hobby project description.',
+        'url' => 'https://showmyrides.com',
+        'description' => 'Visible hobby project description with <a href="https://showmyrides.com">ShowMyRides</a> link.',
         'sort_order' => 1,
         'is_active' => true,
     ]);
@@ -99,7 +100,9 @@ test('the homepage renders the active database version and hides inactive rows',
         ->assertSee('Database managed hero title')
         ->assertSee('Database managed expertise title')
         ->assertSee('Active expertise card')
-        ->assertSee('Active hobby project')
+        ->assertSee('<a class="link link-hover" href="https://showmyrides.com">Active hobby project</a>', false)
+        ->assertSee('<a href="https://showmyrides.com">ShowMyRides</a>', false)
+        ->assertSee('[&amp;_a]:text-blue-600', false)
         ->assertSee('Project screenshot alt text')
         ->assertSee('Active experience card')
         ->assertSee('href="https://github.com/andrewbielecki"', false)

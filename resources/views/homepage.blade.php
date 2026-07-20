@@ -3,6 +3,7 @@
     <head>
         @php
             $metaDescription = \Illuminate\Support\Str::limit(strip_tags($homepage->hero_description), 155, '');
+            $richTextClasses = '[&_a]:text-blue-600 [&_a]:underline [&_a]:decoration-blue-300 [&_a]:decoration-2 [&_a]:underline-offset-4 hover:[&_a]:text-blue-700 hover:[&_a]:decoration-blue-500';
         @endphp
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -66,7 +67,7 @@
                     <h1 class="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
                         {{ $homepage->hero_title }}
                     </h1>
-                    <div class="mt-6 max-w-2xl text-lg leading-8 text-base-content/75">
+                    <div class="mt-6 max-w-2xl text-lg leading-8 text-base-content/75 {{ $richTextClasses }}">
                         {!! $homepage->hero_description !!}
                     </div>
                 </div>
@@ -103,7 +104,7 @@
                                 <article class="card card-border bg-base-100">
                                     <div class="card-body">
                                         <h3 class="card-title text-base">{{ $card->title }}</h3>
-                                        <div class="text-sm leading-6 text-base-content/70">
+                                        <div class="text-sm leading-6 text-base-content/70 {{ $richTextClasses }}">
                                             {!! $card->description !!}
                                         </div>
                                     </div>
@@ -121,7 +122,7 @@
                         <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">
                             {{ $homepage->projects_title }}
                         </h2>
-                        <div class="mt-5 text-base leading-7 text-base-content/70">
+                        <div class="mt-5 text-base leading-7 text-base-content/70 {{ $richTextClasses }}">
                             {!! $homepage->projects_description !!}
                         </div>
                     </div>
@@ -134,7 +135,13 @@
                             @endphp
                             <article class="grid gap-6 {{ $loop->first ? '' : 'border-t border-base-300 pt-14' }} lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-5">
                                 <div class="{{ $textColumn }} lg:row-start-1">
-                                    <h3 class="text-2xl font-semibold leading-tight sm:text-3xl">{{ $project->title }}</h3>
+                                    <h3 class="text-2xl font-semibold leading-tight sm:text-3xl">
+                                        @if ($project->url)
+                                            <a class="link link-hover" href="{{ $project->url }}">{{ $project->title }}</a>
+                                        @else
+                                            {{ $project->title }}
+                                        @endif
+                                    </h3>
                                 </div>
 
                                 <div class="{{ $mediaColumn }} lg:row-span-2 lg:row-start-1">
@@ -160,7 +167,7 @@
                                 </div>
 
                                 <div class="max-w-xl {{ $textColumn }} lg:row-start-2">
-                                    <div class="text-base leading-7 text-base-content/70">
+                                    <div class="text-base leading-7 text-base-content/70 {{ $richTextClasses }}">
                                         {!! $project->description !!}
                                     </div>
                                 </div>
@@ -178,7 +185,7 @@
                             <h2 class="text-3xl font-semibold leading-tight sm:text-4xl">
                                 {{ $homepage->experience_title }}
                             </h2>
-                            <div class="mt-5 text-base leading-7 text-base-content/70">
+                            <div class="mt-5 text-base leading-7 text-base-content/70 {{ $richTextClasses }}">
                                 {!! $homepage->experience_description !!}
                             </div>
                         </div>
@@ -188,7 +195,7 @@
                                 <article class="card card-border bg-base-100">
                                     <div class="card-body">
                                         <h3 class="card-title text-base">{{ $experience->title }}</h3>
-                                        <div class="text-sm leading-6 text-base-content/70">
+                                        <div class="text-sm leading-6 text-base-content/70 {{ $richTextClasses }}">
                                             {!! $experience->description !!}
                                         </div>
                                     </div>
@@ -208,7 +215,7 @@
                                 {{ $homepage->contact_title }}
                             </h2>
                             @if (filled($homepage->contact_description))
-                                <div class="mt-5 text-base leading-7 text-neutral-content/75">
+                                <div class="mt-5 text-base leading-7 text-neutral-content/75 {{ $richTextClasses }}">
                                     {!! $homepage->contact_description !!}
                                 </div>
                             @endif

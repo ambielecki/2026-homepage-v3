@@ -93,7 +93,7 @@ class HomepageController extends Controller
                 $homepage,
                 'projects',
                 $validated['projects'] ?? [],
-                ['image_id', 'title', 'description', 'sort_order', 'is_active'],
+                ['image_id', 'title', 'url', 'description', 'sort_order', 'is_active'],
             );
 
             $this->syncRepeatableItems(
@@ -141,7 +141,7 @@ class HomepageController extends Controller
             }
 
             foreach ($homepage->projects as $project) {
-                $clone->projects()->create($project->only(['image_id', 'title', 'description', 'sort_order', 'is_active']));
+                $clone->projects()->create($project->only(['image_id', 'title', 'url', 'description', 'sort_order', 'is_active']));
             }
 
             foreach ($homepage->experiences as $experience) {
@@ -216,6 +216,7 @@ class HomepageController extends Controller
     {
         return filled($row['id'] ?? null)
             || filled($row['title'] ?? null)
+            || filled($row['url'] ?? null)
             || filled($row['description'] ?? null)
             || filled($row['image_id'] ?? null);
     }

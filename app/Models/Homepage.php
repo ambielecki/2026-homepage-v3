@@ -204,18 +204,21 @@ class Homepage extends Model
         return [
             [
                 'title' => 'DiveLogRepeat',
+                'url' => null,
                 'description' => 'Placeholder copy for a dive log and hobby project that tracks trips, notes, and the details that make dives memorable.',
                 'sort_order' => 1,
                 'is_active' => true,
             ],
             [
                 'title' => 'Homebrew Helper',
+                'url' => null,
                 'description' => 'Placeholder copy for brewing notes, recipe experiments, and a simple place to keep batches from disappearing into old spreadsheets.',
                 'sort_order' => 2,
                 'is_active' => true,
             ],
             [
                 'title' => 'Small tools',
+                'url' => null,
                 'description' => 'Placeholder copy for side utilities, learning projects, and weekend builds that are useful enough to keep around.',
                 'sort_order' => 3,
                 'is_active' => true,

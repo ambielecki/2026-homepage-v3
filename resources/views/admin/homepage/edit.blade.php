@@ -18,12 +18,13 @@
             'id' => $project->id,
             'image_id' => $project->image_id,
             'title' => $project->title,
+            'url' => $project->url,
             'description' => $project->description,
             'sort_order' => $project->sort_order,
             'is_active' => $project->is_active,
             'remove' => false,
         ])->all());
-        $projectRows[] = ['id' => null, 'image_id' => null, 'title' => '', 'description' => '', 'sort_order' => count($projectRows) + 1, 'is_active' => true, 'remove' => false];
+        $projectRows[] = ['id' => null, 'image_id' => null, 'title' => '', 'url' => '', 'description' => '', 'sort_order' => count($projectRows) + 1, 'is_active' => true, 'remove' => false];
 
         $experienceRows = old('experiences', $homepage->experiences->map(fn ($experience) => [
             'id' => $experience->id,
@@ -278,6 +279,14 @@
                                         </div>
                                     </fieldset>
                                 </div>
+
+                                <fieldset class="fieldset">
+                                    <legend class="fieldset-legend">Project URL</legend>
+                                    <input class="input w-full @error('projects.' . $index . '.url') input-error @enderror" type="url" name="projects[{{ $index }}][url]" value="{{ $row['url'] ?? '' }}">
+                                    @error('projects.' . $index . '.url')
+                                        <p class="label text-error">{{ $message }}</p>
+                                    @enderror
+                                </fieldset>
 
                                 <fieldset class="fieldset">
                                     <legend class="fieldset-legend">Description</legend>

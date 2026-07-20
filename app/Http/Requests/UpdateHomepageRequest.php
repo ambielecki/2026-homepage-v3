@@ -49,6 +49,7 @@ class UpdateHomepageRequest extends FormRequest
             'projects.*.id' => ['nullable', 'integer', 'exists:homepage_projects,id'],
             'projects.*.image_id' => ['nullable', 'integer', 'exists:images,id'],
             'projects.*.title' => ['nullable', 'string', 'max:255'],
+            'projects.*.url' => ['nullable', 'url', 'max:255'],
             'projects.*.description' => ['nullable', 'string', 'max:2000'],
             'projects.*.sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
             'projects.*.is_active' => ['sometimes', 'boolean'],

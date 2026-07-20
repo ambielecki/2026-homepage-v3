@@ -20,6 +20,7 @@ class HomepageProjectFactory extends Factory
             'homepage_id' => Homepage::factory(),
             'image_id' => null,
             'title' => fake()->words(3, true),
+            'url' => null,
             'description' => fake()->sentence(),
             'sort_order' => fake()->numberBetween(1, 10),
             'is_active' => true,

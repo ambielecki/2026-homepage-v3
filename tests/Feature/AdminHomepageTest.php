@@ -41,6 +41,23 @@ test('authenticated admins can view homepage versions', function (): void {
         ->assertSee('Create draft');
 });
 
+test('authenticated admins can edit homepage project urls', function (): void {
+    $user = User::factory()->create();
+    $homepage = Homepage::factory()->create();
+    HomepageProject::factory()->for($homepage)->create([
+        'title' => 'ShowMyRides',
+        'url' => 'https://showmyrides.com',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('admin.homepage.edit', $homepage));
+
+    $response
+        ->assertOk()
+        ->assertSee('Project URL')
+        ->assertSee('name="projects[0][url]"', false)
+        ->assertSee('value="https://showmyrides.com"', false);
+});
+
 test('authenticated admins can preview any homepage version without activating it', function (): void {
     $user = User::factory()->create();
     $active = Homepage::factory()->active()->create([
@@ -140,6 +157,7 @@ test('authenticated admins can save homepage edits as a new draft version', func
             [
                 'image_id' => $image->id,
                 'title' => 'New project',
+                'url' => 'https://showmyrides.com',
                 'description' => 'New project description.',
                 'sort_order' => 1,
                 'is_active' => '1',
@@ -172,6 +190,7 @@ test('authenticated admins can save homepage edits as a new draft version', func
         ->and($newHomepage->expertiseCards()->where('title', 'New expertise')->exists())->toBeTrue()
         ->and($newHomepage->projects()->whereKey($project->id)->exists())->toBeFalse()
         ->and($newHomepage->projects()->where('title', 'New project')->exists())->toBeTrue()
+        ->and($newHomepage->projects()->where('url', 'https://showmyrides.com')->exists())->toBeTrue()
         ->and($newHomepage->experiences()->firstOrFail()->is_active)->toBeFalse();
 });
 
@@ -235,6 +254,7 @@ test('authenticated admins can duplicate a homepage version', function (): void 
     ]);
     HomepageProject::factory()->for($homepage)->create([
         'title' => 'Copied project',
+        'url' => 'https://showmyrides.com',
     ]);
     HomepageExperience::factory()->for($homepage)->create([
         'title' => 'Copied experience',
@@ -251,6 +271,7 @@ test('authenticated admins can duplicate a homepage version', function (): void 
     expect($clone->is_active)->toBeFalse()
         ->and($clone->expertiseCards()->where('title', 'Copied expertise')->exists())->toBeTrue()
         ->and($clone->projects()->where('title', 'Copied project')->exists())->toBeTrue()
+        ->and($clone->projects()->where('url', 'https://showmyrides.com')->exists())->toBeTrue()
         ->and($clone->experiences()->where('title', 'Copied experience')->exists())->toBeTrue();
 });
 

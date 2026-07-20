@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'homepage_id',
     'image_id',
     'title',
+    'url',
     'description',
     'sort_order',
     'is_active',
