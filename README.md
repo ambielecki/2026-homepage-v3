@@ -19,6 +19,7 @@ This repository contains the Laravel application for [andrewbielecki.com](https:
 - Admin-editable SEO title and description fields with sensible homepage fallbacks
 - daisyUI theme with a modern blue-led palette
 - Database-backed homepage versions for hero, expertise, hobby projects, experience, and contact content
+- Per-version controls for optional Expertise and Experience homepage sections
 - Active/draft homepage publishing workflow in the admin area
 - Authenticated previews for any homepage version before publishing
 - Reusable admin-managed Projects, Expertise, and Experiences assigned per homepage version

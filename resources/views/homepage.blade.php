@@ -13,6 +13,9 @@
             $socialImageAlt = $socialImage?->alt_text ?? 'Andrew Bielecki homepage preview';
             $socialImageWidth = $socialImage?->width ?? 1200;
             $socialImageHeight = $socialImage?->height ?? 630;
+            $showExpertiseSection = $homepage->show_expertise_section && $homepage->activeExpertiseCards->isNotEmpty();
+            $showProjectsSection = $homepage->activeProjects->isNotEmpty();
+            $showExperienceSection = $homepage->show_experience_section && $homepage->activeExperiences->isNotEmpty();
             $richTextClasses = '[&_a]:text-blue-600 [&_a]:underline [&_a]:decoration-blue-300 [&_a]:decoration-2 [&_a]:underline-offset-4 hover:[&_a]:text-blue-700 hover:[&_a]:decoration-blue-500';
         @endphp
         <meta charset="utf-8">
@@ -72,8 +75,12 @@
 
                 <div class="navbar-end">
                     <ul class="menu menu-horizontal gap-1 px-0 text-sm">
-                        <li><a href="#projects">Projects</a></li>
-                        <li><a href="#expertise">Expertise</a></li>
+                        @if ($showProjectsSection)
+                            <li><a href="#projects">Projects</a></li>
+                        @endif
+                        @if ($showExpertiseSection)
+                            <li><a href="#expertise">Expertise</a></li>
+                        @endif
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -112,7 +119,7 @@
                 </div>
             </section>
 
-            @if ($homepage->activeExpertiseCards->isNotEmpty())
+            @if ($showExpertiseSection)
                 <section id="expertise" class="bg-base-200 py-16 sm:py-20">
                     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div class="max-w-3xl">
@@ -138,7 +145,7 @@
                 </section>
             @endif
 
-            @if ($homepage->activeProjects->isNotEmpty())
+            @if ($showProjectsSection)
                 <section id="projects" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
                     <div class="max-w-4xl">
                         <p class="mb-4 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->projects_headline }}</p>
@@ -200,7 +207,7 @@
                 </section>
             @endif
 
-            @if ($homepage->activeExperiences->isNotEmpty())
+            @if ($showExperienceSection)
                 <section id="experience" class="bg-base-200 py-16 sm:py-20">
                     <div class="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.7fr_1fr] lg:px-8">
                         <div>

@@ -25,12 +25,14 @@ use Illuminate\Support\Str;
     'hero_description',
     'expertise_headline',
     'expertise_title',
+    'show_expertise_section',
     'projects_headline',
     'projects_title',
     'projects_description',
     'experience_headline',
     'experience_title',
     'experience_description',
+    'show_experience_section',
     'contact_headline',
     'contact_title',
     'contact_description',
@@ -49,6 +51,8 @@ class Homepage extends Model
     {
         return [
             'is_active' => 'boolean',
+            'show_expertise_section' => 'boolean',
+            'show_experience_section' => 'boolean',
         ];
     }
 
@@ -190,12 +194,14 @@ class Homepage extends Model
             'hero_description' => 'I work across product delivery, backend architecture, and practical frontend implementation. The final copy will land later; this version establishes the structure for an employer-focused professional profile.',
             'expertise_headline' => 'Expertise',
             'expertise_title' => 'Engineering judgment for teams that need momentum and maintainability.',
+            'show_expertise_section' => true,
             'projects_headline' => 'Hobby Projects',
             'projects_title' => 'Half-finished ideas, useful experiments, and a few things I keep coming back to.',
             'projects_description' => 'This section is for personal projects and interests rather than polished case studies. The current copy is placeholder content, but the shape is ready for dive logs, homebrewing notes, small tools, and weekend builds.',
             'experience_headline' => 'Experience',
             'experience_title' => 'Professional experience still does the heavy lifting.',
             'experience_description' => 'A few themes that describe the professional work behind the public profile.',
+            'show_experience_section' => true,
             'contact_headline' => 'Contact',
             'contact_title' => 'Looking for a lead engineer who can bridge product, architecture, and delivery?',
             'contact_description' => 'This area will eventually include final contact details. For now, it provides the intended shape for employer-focused calls to action.',

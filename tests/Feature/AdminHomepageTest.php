@@ -138,6 +138,24 @@ test('authenticated admins can edit homepage seo fields', function (): void {
         ->assertSee('Editable SEO description.');
 });
 
+test('authenticated admins can edit optional section visibility', function (): void {
+    $user = User::factory()->create();
+    $homepage = Homepage::factory()->create([
+        'show_expertise_section' => false,
+        'show_experience_section' => true,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('admin.homepage.edit', $homepage));
+
+    $response
+        ->assertOk()
+        ->assertSee('Show Expertise section')
+        ->assertSee('name="show_expertise_section"', false)
+        ->assertSee('Show Experience section')
+        ->assertSee('name="show_experience_section"', false)
+        ->assertSee('class="toggle"', false);
+});
+
 test('authenticated admins can create a draft homepage version with default assignments', function (): void {
     $user = User::factory()->create();
 
@@ -150,6 +168,8 @@ test('authenticated admins can create a draft homepage version with default assi
         ->assertSessionHas('status', 'Homepage draft created.');
 
     expect($homepage->is_active)->toBeFalse()
+        ->and($homepage->show_expertise_section)->toBeTrue()
+        ->and($homepage->show_experience_section)->toBeTrue()
         ->and(HomepageExpertiseCard::query()->count())->toBe(3)
         ->and(HomepageProject::query()->count())->toBe(3)
         ->and(HomepageExperience::query()->count())->toBe(4)
@@ -187,12 +207,14 @@ test('authenticated admins can save homepage edits as a new draft version with a
         'hero_description' => 'Updated hero description.',
         'expertise_headline' => 'Updated expertise headline',
         'expertise_title' => 'Updated expertise title',
+        'show_expertise_section' => '0',
         'projects_headline' => 'Updated projects headline',
         'projects_title' => 'Updated projects title',
         'projects_description' => 'Updated projects description.',
         'experience_headline' => 'Updated experience headline',
         'experience_title' => 'Updated experience title',
         'experience_description' => 'Updated experience description.',
+        'show_experience_section' => '1',
         'contact_headline' => 'Updated contact headline',
         'contact_title' => 'Updated contact title',
         'contact_description' => 'Updated contact description.',
@@ -243,6 +265,8 @@ test('authenticated admins can save homepage edits as a new draft version with a
         ->and($newHomepage->hero_image_id)->toBe($image->id)
         ->and($newHomepage->meta_title)->toBe('Updated SEO title')
         ->and($newHomepage->meta_description)->toBe('Updated SEO description.')
+        ->and($newHomepage->show_expertise_section)->toBeFalse()
+        ->and($newHomepage->show_experience_section)->toBeTrue()
         ->and($newHomepage->github_url)->toBe('https://github.com/andrewbielecki')
         ->and((int) $activeExpertise->pivot->sort_order)->toBe(2)
         ->and((bool) $activeExpertise->pivot->is_active)->toBeTrue()
@@ -307,6 +331,8 @@ test('authenticated admins can duplicate a homepage version with assignments', f
         'name' => 'Original version',
         'meta_title' => 'Original SEO title',
         'meta_description' => 'Original SEO description.',
+        'show_expertise_section' => false,
+        'show_experience_section' => true,
     ]);
     $expertise = HomepageExpertiseCard::factory()->create([
         'title' => 'Copied expertise',
@@ -335,6 +361,8 @@ test('authenticated admins can duplicate a homepage version with assignments', f
     expect($clone->is_active)->toBeFalse()
         ->and($clone->meta_title)->toBe('Original SEO title')
         ->and($clone->meta_description)->toBe('Original SEO description.')
+        ->and($clone->show_expertise_section)->toBeFalse()
+        ->and($clone->show_experience_section)->toBeTrue()
         ->and($clone->expertiseCards()->whereKey($expertise->id)->exists())->toBeTrue()
         ->and($clone->projects()->whereKey($project->id)->exists())->toBeTrue()
         ->and($clone->projects()->where('url', 'https://showmyrides.com')->exists())->toBeTrue()
