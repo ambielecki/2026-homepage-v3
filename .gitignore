@@ -24,6 +24,7 @@
 /storage/pail
 /vendor
 _ide_helper.php
+deploy.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
