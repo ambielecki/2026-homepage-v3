@@ -23,7 +23,8 @@ necessary PHP commands should be run in the docker container by using `docker ex
 ## Other
 - Create a commit message after any changes
 - Please commit any files in ./planning that are relevant to the current work
-- If we are working in branch other than main, create a PR to main after changes with the commit message
+- never work on main, if we are currently on main, pull changes and create a new branch from main
+- create a PR to main after changes with the commit message
 - commit and pr messages do not need to describe tests run locally
 - If a PR already exists for the branch to main, just push changes
 - Update the README.md after major functionality changes
