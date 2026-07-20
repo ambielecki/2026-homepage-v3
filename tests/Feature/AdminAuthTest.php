@@ -13,6 +13,10 @@ test('the login page renders with csrf protection', function (): void {
     $response
         ->assertOk()
         ->assertSee('Login')
+        ->assertSee('href="'.asset('favicon.ico').'"', false)
+        ->assertSee('type="image/svg+xml" href="'.asset('favicon.svg').'"', false)
+        ->assertSee('href="'.asset('apple-touch-icon.png').'"', false)
+        ->assertSee('href="'.asset('site.webmanifest').'"', false)
         ->assertDontSee('Sign in to manage homepage content.')
         ->assertDontSee('This area is restricted to administrator accounts created from the command line.')
         ->assertSee('name="_token"', false);

@@ -27,6 +27,10 @@ test('the homepage returns a successful response with default content when no ve
         ->assertSee('href="https://www.linkedin.com/in/andrewbielecki"', false)
         ->assertSee('GitHub')
         ->assertSee('LinkedIn')
+        ->assertSee('href="'.asset('favicon.ico').'"', false)
+        ->assertSee('type="image/svg+xml" href="'.asset('favicon.svg').'"', false)
+        ->assertSee('href="'.asset('apple-touch-icon.png').'"', false)
+        ->assertSee('href="'.asset('site.webmanifest').'"', false)
         ->assertDontSee('Start a conversation')
         ->assertDontSee('View hobby projects')
         ->assertDontSee('href="#github-placeholder"', false)
@@ -127,4 +131,19 @@ test('the homepage omits the contact description when it is empty', function ():
         ->assertSee('href="https://github.com/andrewbielecki"', false)
         ->assertSee('href="https://www.linkedin.com/in/andrewbielecki"', false)
         ->assertDontSee('text-neutral-content/75', false);
+});
+
+test('favicon assets exist for browser fallbacks', function (): void {
+    foreach ([
+        'favicon.ico',
+        'favicon.svg',
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'apple-touch-icon.png',
+        'android-chrome-192x192.png',
+        'android-chrome-512x512.png',
+        'site.webmanifest',
+    ] as $path) {
+        $this->assertFileExists(public_path($path));
+    }
 });

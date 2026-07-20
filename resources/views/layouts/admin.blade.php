@@ -7,6 +7,8 @@
 
         <title>@yield('title', 'Admin') | Andrew Bielecki</title>
 
+        <x-favicons />
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-base-100 text-base-content antialiased">
