@@ -8,6 +8,7 @@ use App\Models\HomepageExpertiseCard;
 use App\Models\HomepageProject;
 use App\Models\Image;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -16,6 +17,14 @@ test('the homepage returns a successful response with default content when no ve
 
     $response
         ->assertOk()
+        ->assertSee('<title>Andrew Bielecki | Lead Software Engineer</title>', false)
+        ->assertSee('content="'.Homepage::defaultContent()->resolvedMetaDescription().'"', false)
+        ->assertSee('property="og:title" content="Andrew Bielecki | Lead Software Engineer"', false)
+        ->assertSee('name="twitter:card" content="summary_large_image"', false)
+        ->assertSee('content="'.asset('social-card.png').'"', false)
+        ->assertSee('property="og:image:width" content="1200"', false)
+        ->assertSee('property="og:image:height" content="630"', false)
+        ->assertSee('name="robots" content="noindex, nofollow"', false)
         ->assertSee('Andrew Bielecki | Lead Software Engineer')
         ->assertSee('Building useful software, keeping teams moving, and making room for side projects.')
         ->assertSee('Engineering judgment for teams that need momentum and maintainability.')
@@ -35,6 +44,28 @@ test('the homepage returns a successful response with default content when no ve
         ->assertDontSee('View hobby projects')
         ->assertDontSee('href="#github-placeholder"', false)
         ->assertDontSee('href="#linkedin-placeholder"', false);
+});
+
+test('the homepage renders custom seo metadata when configured', function (): void {
+    Homepage::factory()->active()->create([
+        'hero_headline' => 'Fallback headline',
+        'hero_description' => 'Fallback hero description should not be used for metadata.',
+        'meta_title' => 'Custom homepage SEO title',
+        'meta_description' => 'Custom homepage SEO description.',
+    ]);
+
+    $response = $this->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSee('<title>Custom homepage SEO title</title>', false)
+        ->assertSee('name="description" content="Custom homepage SEO description."', false)
+        ->assertSee('property="og:title" content="Custom homepage SEO title"', false)
+        ->assertSee('property="og:description" content="Custom homepage SEO description."', false)
+        ->assertSee('name="twitter:title" content="Custom homepage SEO title"', false)
+        ->assertSee('name="twitter:description" content="Custom homepage SEO description."', false)
+        ->assertDontSee('<title>Andrew Bielecki | Fallback headline</title>', false)
+        ->assertDontSee('name="description" content="Fallback hero description should not be used for metadata."', false);
 });
 
 test('the homepage renders the active database version and hides inactive rows', function (): void {
@@ -135,6 +166,67 @@ test('the homepage omits the contact description when it is empty', function ():
         ->assertSee('href="https://github.com/andrewbielecki"', false)
         ->assertSee('href="https://www.linkedin.com/in/andrewbielecki"', false)
         ->assertDontSee('text-neutral-content/75', false);
+});
+
+test('the homepage social image metadata uses the configured hero image', function (): void {
+    $image = Image::factory()->create([
+        'alt_text' => 'Portrait of Andrew Bielecki',
+        'original_path' => 'images/hero/andrew.jpg',
+        'width' => 1600,
+        'height' => 900,
+    ]);
+
+    Homepage::factory()->active()->create([
+        'hero_image_id' => $image->id,
+    ]);
+
+    $imageUrl = $image->originalUrl();
+    $imageUrl = Str::startsWith($imageUrl, ['http://', 'https://']) ? $imageUrl : url($imageUrl);
+
+    $response = $this->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSee('property="og:image" content="'.$imageUrl.'"', false)
+        ->assertSee('property="og:image:alt" content="Portrait of Andrew Bielecki"', false)
+        ->assertSee('property="og:image:width" content="1600"', false)
+        ->assertSee('property="og:image:height" content="900"', false)
+        ->assertSee('name="twitter:image" content="'.$imageUrl.'"', false)
+        ->assertSee('name="twitter:image:alt" content="Portrait of Andrew Bielecki"', false);
+});
+
+test('the production homepage allows indexing', function (): void {
+    config(['app.env' => 'production']);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('name="robots" content="index, follow"', false);
+});
+
+test('robots points crawlers to the homepage sitemap', function (): void {
+    config(['app.url' => 'https://www.andrewbielecki.com']);
+
+    $this->get('/robots.txt')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+        ->assertSee('User-agent: *')
+        ->assertSee('Disallow:')
+        ->assertSee('Sitemap: https://www.andrewbielecki.com/sitemap.xml')
+        ->assertDontSee('/login')
+        ->assertDontSee('/admin');
+});
+
+test('the sitemap includes only the public homepage', function (): void {
+    config(['app.url' => 'https://www.andrewbielecki.com']);
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+        ->assertSee('<loc>https://www.andrewbielecki.com</loc>', false)
+        ->assertDontSee('/login')
+        ->assertDontSee('/admin')
+        ->assertDontSee('/admin/homepage')
+        ->assertDontSee('/preview');
 });
 
 test('favicon assets exist for browser fallbacks', function (): void {

@@ -2,22 +2,40 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="bielecki">
     <head>
         @php
-            $metaDescription = \Illuminate\Support\Str::limit(strip_tags($homepage->hero_description), 155, '');
+            $siteUrl = rtrim((string) config('app.url'), '/');
+            $metaTitle = $homepage->resolvedMetaTitle();
+            $metaDescription = $homepage->resolvedMetaDescription();
+            $isPreviewPage = $isPreview ?? false;
+            $robotsContent = config('app.env') === 'production' && ! $isPreviewPage ? 'index, follow' : 'noindex, nofollow';
+            $socialImage = $homepage->heroImage;
+            $socialImageUrl = $socialImage ? $socialImage->originalUrl() : asset('social-card.png');
+            $socialImageUrl = \Illuminate\Support\Str::startsWith($socialImageUrl, ['http://', 'https://']) ? $socialImageUrl : url($socialImageUrl);
+            $socialImageAlt = $socialImage?->alt_text ?? 'Andrew Bielecki homepage preview';
+            $socialImageWidth = $socialImage?->width ?? 1200;
+            $socialImageHeight = $socialImage?->height ?? 630;
             $richTextClasses = '[&_a]:text-blue-600 [&_a]:underline [&_a]:decoration-blue-300 [&_a]:decoration-2 [&_a]:underline-offset-4 hover:[&_a]:text-blue-700 hover:[&_a]:decoration-blue-500';
         @endphp
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="{{ $metaDescription }}">
-        <meta name="robots" content="{{ ($isPreview ?? false) ? 'noindex, nofollow' : 'index, follow' }}">
-        <link rel="canonical" href="https://www.andrewbielecki.com">
+        <meta name="robots" content="{{ $robotsContent }}">
+        <link rel="canonical" href="{{ $siteUrl }}">
 
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://www.andrewbielecki.com">
-        <meta property="og:title" content="Andrew Bielecki | {{ $homepage->hero_headline }}">
+        <meta property="og:url" content="{{ $siteUrl }}">
+        <meta property="og:title" content="{{ $metaTitle }}">
         <meta property="og:description" content="{{ $metaDescription }}">
-        <meta name="twitter:card" content="summary">
+        <meta property="og:image" content="{{ $socialImageUrl }}">
+        <meta property="og:image:alt" content="{{ $socialImageAlt }}">
+        <meta property="og:image:width" content="{{ $socialImageWidth }}">
+        <meta property="og:image:height" content="{{ $socialImageHeight }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $metaTitle }}">
+        <meta name="twitter:description" content="{{ $metaDescription }}">
+        <meta name="twitter:image" content="{{ $socialImageUrl }}">
+        <meta name="twitter:image:alt" content="{{ $socialImageAlt }}">
 
-        <title>Andrew Bielecki | {{ $homepage->hero_headline }}</title>
+        <title>{{ $metaTitle }}</title>
 
         <x-favicons />
 

@@ -97,6 +97,30 @@
 
             <div class="card card-border bg-base-100">
                 <div class="card-body">
+                    <h2 class="card-title">SEO</h2>
+
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Meta title</legend>
+                        <input class="input w-full @error('meta_title') input-error @enderror" type="text" name="meta_title" value="{{ old('meta_title', $homepage->meta_title) }}" maxlength="70">
+                        <p class="label">Optional. Falls back to Andrew Bielecki | {{ $homepage->hero_headline }}.</p>
+                        @error('meta_title')
+                            <p class="label text-error">{{ $message }}</p>
+                        @enderror
+                    </fieldset>
+
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Meta description</legend>
+                        <textarea class="textarea min-h-24 w-full @error('meta_description') textarea-error @enderror" name="meta_description" maxlength="160">{{ old('meta_description', $homepage->meta_description) }}</textarea>
+                        <p class="label">Optional. Falls back to a plain-text summary of the hero description.</p>
+                        @error('meta_description')
+                            <p class="label text-error">{{ $message }}</p>
+                        @enderror
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="card card-border bg-base-100">
+                <div class="card-body">
                     <h2 class="card-title">Hero section</h2>
 
                     <div class="grid gap-4 lg:grid-cols-2">

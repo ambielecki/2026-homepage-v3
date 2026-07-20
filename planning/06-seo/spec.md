@@ -29,6 +29,7 @@ Improve homepage metadata, sharing previews, and indexing controls.
   - Admin and auth pages should continue rendering `noindex, nofollow`
 - Add SEO support files
   - Add a sitemap for the single public homepage
+  - The sitemap should include only the homepage URL and no login, admin, or preview routes
   - Include the sitemap URL in `robots.txt`
   - Keep `robots.txt` permissive for production
 - Add tests
@@ -44,3 +45,4 @@ Improve homepage metadata, sharing previews, and indexing controls.
 - Editors can customize the page title and description for each homepage version from the admin CMS.
 - Staging and local environments are not indexable by search engines.
 - Production robots and sitemap files point crawlers at `https://www.andrewbielecki.com`.
+- The sitemap contains only the public homepage URL.

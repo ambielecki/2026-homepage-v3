@@ -12,11 +12,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'name',
     'is_active',
     'hero_image_id',
+    'meta_title',
+    'meta_description',
     'hero_headline',
     'hero_title',
     'hero_description',
@@ -126,6 +129,24 @@ class Homepage extends Model
         return $this->experiences()->wherePivot('is_active', true);
     }
 
+    public function resolvedMetaTitle(): string
+    {
+        if (filled($this->meta_title)) {
+            return (string) $this->meta_title;
+        }
+
+        return sprintf('Andrew Bielecki | %s', $this->hero_headline);
+    }
+
+    public function resolvedMetaDescription(): string
+    {
+        if (filled($this->meta_description)) {
+            return $this->plainText((string) $this->meta_description, 160);
+        }
+
+        return $this->plainText((string) $this->hero_description, 155);
+    }
+
     public static function defaultContent(): self
     {
         $homepage = new self(self::defaultAttributes('Default homepage'));
@@ -162,6 +183,8 @@ class Homepage extends Model
             'name' => $name ?? 'Homepage draft',
             'is_active' => false,
             'hero_image_id' => null,
+            'meta_title' => null,
+            'meta_description' => null,
             'hero_headline' => 'Lead Software Engineer',
             'hero_title' => 'Building useful software, keeping teams moving, and making room for side projects.',
             'hero_description' => 'I work across product delivery, backend architecture, and practical frontend implementation. The final copy will land later; this version establishes the structure for an employer-focused professional profile.',
@@ -269,5 +292,10 @@ class Homepage extends Model
                 'is_active' => true,
             ],
         ];
+    }
+
+    private function plainText(string $value, int $limit): string
+    {
+        return Str::limit(trim((string) preg_replace('/\s+/', ' ', strip_tags($value))), $limit, '');
     }
 }

@@ -86,6 +86,7 @@ test('authenticated admins can edit project urls in the project section', functi
 
 test('authenticated admins can preview any homepage version without activating it', function (): void {
     $user = User::factory()->create();
+    config(['app.env' => 'production']);
     $active = Homepage::factory()->active()->create([
         'hero_title' => 'Currently active homepage',
     ]);
@@ -117,6 +118,24 @@ test('authenticated admins can preview any homepage version without activating i
 
     expect($active->fresh()->is_active)->toBeTrue()
         ->and($draft->fresh()->is_active)->toBeFalse();
+});
+
+test('authenticated admins can edit homepage seo fields', function (): void {
+    $user = User::factory()->create();
+    $homepage = Homepage::factory()->create([
+        'meta_title' => 'Editable SEO title',
+        'meta_description' => 'Editable SEO description.',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('admin.homepage.edit', $homepage));
+
+    $response
+        ->assertOk()
+        ->assertSee('SEO')
+        ->assertSee('name="meta_title"', false)
+        ->assertSee('value="Editable SEO title"', false)
+        ->assertSee('name="meta_description"', false)
+        ->assertSee('Editable SEO description.');
 });
 
 test('authenticated admins can create a draft homepage version with default assignments', function (): void {
@@ -161,6 +180,8 @@ test('authenticated admins can save homepage edits as a new draft version with a
     $response = $this->actingAs($user)->put(route('admin.homepage.update', $homepage), [
         'name' => 'Updated homepage',
         'hero_image_id' => $image->id,
+        'meta_title' => 'Updated SEO title',
+        'meta_description' => 'Updated SEO description.',
         'hero_headline' => 'Updated hero headline',
         'hero_title' => 'Updated hero title',
         'hero_description' => 'Updated hero description.',
@@ -220,6 +241,8 @@ test('authenticated admins can save homepage edits as a new draft version with a
     expect($homepage->fresh()->name)->not->toBe('Updated homepage')
         ->and($newHomepage->is_active)->toBeFalse()
         ->and($newHomepage->hero_image_id)->toBe($image->id)
+        ->and($newHomepage->meta_title)->toBe('Updated SEO title')
+        ->and($newHomepage->meta_description)->toBe('Updated SEO description.')
         ->and($newHomepage->github_url)->toBe('https://github.com/andrewbielecki')
         ->and((int) $activeExpertise->pivot->sort_order)->toBe(2)
         ->and((bool) $activeExpertise->pivot->is_active)->toBeTrue()
@@ -282,6 +305,8 @@ test('authenticated admins can duplicate a homepage version with assignments', f
     $user = User::factory()->create();
     $homepage = Homepage::factory()->active()->create([
         'name' => 'Original version',
+        'meta_title' => 'Original SEO title',
+        'meta_description' => 'Original SEO description.',
     ]);
     $expertise = HomepageExpertiseCard::factory()->create([
         'title' => 'Copied expertise',
@@ -308,6 +333,8 @@ test('authenticated admins can duplicate a homepage version with assignments', f
         ->assertSessionHas('status', 'Homepage version duplicated.');
 
     expect($clone->is_active)->toBeFalse()
+        ->and($clone->meta_title)->toBe('Original SEO title')
+        ->and($clone->meta_description)->toBe('Original SEO description.')
         ->and($clone->expertiseCards()->whereKey($expertise->id)->exists())->toBeTrue()
         ->and($clone->projects()->whereKey($project->id)->exists())->toBeTrue()
         ->and($clone->projects()->where('url', 'https://showmyrides.com')->exists())->toBeTrue()
