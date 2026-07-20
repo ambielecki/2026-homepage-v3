@@ -81,32 +81,35 @@
         </header>
 
         <main id="top">
-            <section class="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1fr_0.9fr] lg:px-8 lg:py-24">
-                <div class="max-w-3xl">
-                    <p class="mb-5 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->hero_headline }}</p>
-                    <h1 class="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
-                        {{ $homepage->hero_title }}
-                    </h1>
-                    <div class="mt-6 max-w-2xl text-lg leading-8 text-base-content/85 {{ $richTextClasses }}">
+            <section class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+                <div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:gap-x-14 lg:gap-y-12">
+                    <div class="max-w-6xl lg:col-span-2">
+                        <p class="mb-5 text-sm font-semibold uppercase text-base-content/85">{{ $homepage->hero_headline }}</p>
+                        <h1 class="text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+                            {{ $homepage->hero_title }}
+                        </h1>
+                    </div>
+
+                    <div class="max-w-2xl text-lg leading-8 text-base-content/85 {{ $richTextClasses }}">
                         {!! $homepage->hero_description !!}
                     </div>
-                </div>
 
-                @if ($homepage->heroImage)
-                    <div class="aspect-[4/3] w-full overflow-hidden rounded-box border border-base-300 bg-base-200 shadow-xl">
-                        <img class="h-full w-full object-cover" src="{{ $homepage->heroImage->thumbnailUrl() }}" alt="{{ $homepage->heroImage->alt_text }}">
-                    </div>
-                @else
-                    <div class="aspect-[4/3] w-full overflow-hidden rounded-box border border-base-300 bg-base-200 shadow-xl" role="img" aria-label="Placeholder for a professional profile image">
-                        <div class="grid h-full grid-cols-6 grid-rows-5 gap-2 p-4">
-                            <div class="col-span-4 row-span-3 rounded-box bg-primary/80"></div>
-                            <div class="col-span-2 row-span-2 rounded-box bg-accent/70"></div>
-                            <div class="col-span-2 row-span-3 rounded-box bg-secondary/70"></div>
-                            <div class="col-span-2 row-span-2 rounded-box bg-neutral/80"></div>
-                            <div class="col-span-2 row-span-2 rounded-box bg-base-300"></div>
+                    @if ($homepage->heroImage)
+                        <div class="aspect-[4/3] w-full overflow-hidden rounded-box border border-base-300 bg-base-200 shadow-xl">
+                            <img class="h-full w-full object-cover" src="{{ $homepage->heroImage->thumbnailUrl() }}" alt="{{ $homepage->heroImage->alt_text }}">
                         </div>
-                    </div>
-                @endif
+                    @else
+                        <div class="aspect-[4/3] w-full overflow-hidden rounded-box border border-base-300 bg-base-200 shadow-xl" role="img" aria-label="Placeholder for a professional profile image">
+                            <div class="grid h-full grid-cols-6 grid-rows-5 gap-2 p-4">
+                                <div class="col-span-4 row-span-3 rounded-box bg-primary/80"></div>
+                                <div class="col-span-2 row-span-2 rounded-box bg-accent/70"></div>
+                                <div class="col-span-2 row-span-3 rounded-box bg-secondary/70"></div>
+                                <div class="col-span-2 row-span-2 rounded-box bg-neutral/80"></div>
+                                <div class="col-span-2 row-span-2 rounded-box bg-base-300"></div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </section>
 
             @if ($homepage->activeExpertiseCards->isNotEmpty())

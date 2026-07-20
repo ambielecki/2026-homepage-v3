@@ -25,6 +25,8 @@ test('the homepage returns a successful response with default content when no ve
         ->assertSee('property="og:image:width" content="1200"', false)
         ->assertSee('property="og:image:height" content="630"', false)
         ->assertSee('name="robots" content="noindex, nofollow"', false)
+        ->assertSee('lg:col-span-2', false)
+        ->assertSee('lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]', false)
         ->assertSee('Andrew Bielecki | Lead Software Engineer')
         ->assertSee('Building useful software, keeping teams moving, and making room for side projects.')
         ->assertSee('Engineering judgment for teams that need momentum and maintainability.')
