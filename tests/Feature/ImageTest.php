@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Models\Homepage;
+use App\Models\HomepageProject;
 use App\Models\Image;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,8 +13,11 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 test('image admin routes require authentication', function (): void {
+    $image = Image::factory()->create();
+
     $this->get('/admin/images')->assertRedirect('/login');
     $this->get('/admin/images/create')->assertRedirect('/login');
+    $this->delete(sprintf('/admin/images/%s', $image->id))->assertRedirect('/login');
 });
 
 test('authenticated admins can view the image list', function (): void {
@@ -32,7 +37,31 @@ test('authenticated admins can view the image list', function (): void {
         ->assertSee('Images')
         ->assertSee('Homepage header image')
         ->assertSee('Blue geometric header')
-        ->assertSee('Edit');
+        ->assertSee('Edit')
+        ->assertSee('Delete')
+        ->assertSee(sprintf('delete-image-%s', $image->id))
+        ->assertSee(route('admin.images.destroy', $image), false)
+        ->assertSee('Delete image?');
+});
+
+test('authenticated admins can view image delete controls on the edit page', function (): void {
+    Storage::fake('public');
+    $user = User::factory()->create();
+    $image = Image::factory()->create([
+        'alt_text' => 'Editable image',
+    ]);
+
+    Storage::disk('public')->put($image->original_path, 'image-content');
+
+    $response = $this->actingAs($user)->get(route('admin.images.edit', $image));
+
+    $response
+        ->assertOk()
+        ->assertSee('Edit image')
+        ->assertSee('Delete')
+        ->assertSee(sprintf('delete-image-%s', $image->id))
+        ->assertSee(route('admin.images.destroy', $image), false)
+        ->assertSee('Delete image?');
 });
 
 test('authenticated admins can view the upload form', function (): void {
@@ -121,6 +150,88 @@ test('authenticated admins can edit image metadata', function (): void {
     expect($image->description)->toBe('Updated image description')
         ->and($image->alt_text)->toBe('Updated alt text')
         ->and($image->is_header)->toBeTrue();
+});
+
+test('authenticated admins can delete unused images and stored files', function (): void {
+    Storage::fake('public');
+    $user = User::factory()->create();
+    $image = Image::factory()->create([
+        'has_sizes' => true,
+    ]);
+
+    Storage::disk('public')->put($image->original_path, 'original-content');
+    Storage::disk('public')->put($image->sizedPath('small'), 'small-content');
+    Storage::disk('public')->put($image->sizedPath('medium'), 'medium-content');
+    Storage::disk('public')->put($image->sizedPath('large'), 'large-content');
+
+    $response = $this->actingAs($user)->delete(route('admin.images.destroy', $image));
+
+    $response
+        ->assertRedirect(route('admin.images.index'))
+        ->assertSessionHas('status', 'Image deleted.');
+
+    expect(Image::query()->whereKey($image->id)->exists())->toBeFalse();
+
+    Storage::disk('public')->assertMissing($image->original_path);
+    Storage::disk('public')->assertMissing($image->sizedPath('small'));
+    Storage::disk('public')->assertMissing($image->sizedPath('medium'));
+    Storage::disk('public')->assertMissing($image->sizedPath('large'));
+});
+
+test('authenticated admins cannot delete images used by homepage versions', function (): void {
+    Storage::fake('public');
+    $user = User::factory()->create();
+    $image = Image::factory()->create();
+    $homepage = Homepage::factory()->create([
+        'name' => 'Published homepage',
+        'hero_image_id' => $image->id,
+    ]);
+
+    Storage::disk('public')->put($image->original_path, 'image-content');
+
+    $response = $this
+        ->actingAs($user)
+        ->from(route('admin.images.edit', $image))
+        ->delete(route('admin.images.destroy', $image));
+
+    $response
+        ->assertRedirect(route('admin.images.edit', $image))
+        ->assertSessionHas('image_delete_error', 'Image cannot be deleted because it is still in use.')
+        ->assertSessionHas('image_delete_usages', [[
+            'label' => 'Homepage: Published homepage',
+            'url' => route('admin.homepage.edit', $homepage),
+        ]]);
+
+    expect($image->fresh())->not->toBeNull();
+    Storage::disk('public')->assertExists($image->original_path);
+});
+
+test('authenticated admins cannot delete images used by homepage projects', function (): void {
+    Storage::fake('public');
+    $user = User::factory()->create();
+    $image = Image::factory()->create();
+    $project = HomepageProject::factory()->create([
+        'title' => 'Project using image',
+        'image_id' => $image->id,
+    ]);
+
+    Storage::disk('public')->put($image->original_path, 'image-content');
+
+    $response = $this
+        ->actingAs($user)
+        ->from(route('admin.images.index'))
+        ->delete(route('admin.images.destroy', $image));
+
+    $response
+        ->assertRedirect(route('admin.images.index'))
+        ->assertSessionHas('image_delete_error', 'Image cannot be deleted because it is still in use.')
+        ->assertSessionHas('image_delete_usages', [[
+            'label' => 'Project: Project using image',
+            'url' => route('admin.projects.edit', $project),
+        ]]);
+
+    expect($image->fresh())->not->toBeNull();
+    Storage::disk('public')->assertExists($image->original_path);
 });
 
 test('the image processing command fails clearly for missing records', function (): void {

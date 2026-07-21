@@ -22,6 +22,8 @@
             </div>
         @endif
 
+        @include('admin.images.partials.delete-blocked-alert')
+
         @if ($images->isEmpty())
             <div class="card card-border mt-10 bg-base-100">
                 <div class="card-body">
@@ -48,6 +50,7 @@
                             </p>
                             <div class="card-actions justify-end">
                                 <a class="btn btn-sm" href="{{ route('admin.images.edit', $image) }}">Edit</a>
+                                @include('admin.images.partials.delete-modal', ['image' => $image])
                             </div>
                         </div>
                     </article>

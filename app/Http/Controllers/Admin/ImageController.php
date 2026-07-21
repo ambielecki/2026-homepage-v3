@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreImageRequest;
 use App\Http\Requests\UpdateImageRequest;
+use App\Models\Homepage;
+use App\Models\HomepageProject;
 use App\Models\Image as HomepageImage;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -112,5 +114,50 @@ class ImageController extends Controller
         return redirect()
             ->route('admin.images.index')
             ->with('status', 'Image updated.');
+    }
+
+    public function destroy(HomepageImage $image): RedirectResponse
+    {
+        $usages = $this->imageUsages($image);
+
+        if ($usages !== []) {
+            return redirect()
+                ->back()
+                ->with('image_delete_error', 'Image cannot be deleted because it is still in use.')
+                ->with('image_delete_usages', $usages);
+        }
+
+        Storage::disk('public')->deleteDirectory(dirname($image->original_path));
+        $image->delete();
+
+        return redirect()
+            ->route('admin.images.index')
+            ->with('status', 'Image deleted.');
+    }
+
+    /**
+     * @return array<int, array{label: string, url: string}>
+     */
+    private function imageUsages(HomepageImage $image): array
+    {
+        $homepageUsages = $image->homepages()
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Homepage $homepage): array => [
+                'label' => sprintf('Homepage: %s', $homepage->name),
+                'url' => route('admin.homepage.edit', $homepage),
+            ])
+            ->all();
+
+        $projectUsages = $image->projects()
+            ->orderBy('title')
+            ->get()
+            ->map(fn (HomepageProject $project): array => [
+                'label' => sprintf('Project: %s', $project->title),
+                'url' => route('admin.projects.edit', $project),
+            ])
+            ->all();
+
+        return array_values(array_merge($homepageUsages, $projectUsages));
     }
 }
