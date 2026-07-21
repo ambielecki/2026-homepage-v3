@@ -179,7 +179,9 @@
 
                                 <div class="{{ $mediaColumn }} lg:row-span-2 lg:row-start-1">
                                     @if ($project->image)
-                                        <img class="aspect-video w-full rounded-box border border-base-300 object-cover" src="{{ $project->image->thumbnailUrl() }}" alt="{{ $project->image->alt_text }}">
+                                        <div class="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-box border border-base-300 bg-base-200">
+                                            <img class="h-full w-full object-contain" src="{{ $project->image->thumbnailUrl() }}" alt="{{ $project->image->alt_text }}">
+                                        </div>
                                     @else
                                         <div class="mockup-browser border border-base-300 bg-base-200" role="img" aria-label="Placeholder screenshot for {{ $project->title }}">
                                             <div class="mockup-browser-toolbar">

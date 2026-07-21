@@ -147,6 +147,8 @@ test('the homepage renders the active database version and hides inactive rows',
         ], false)
         ->assertSee('[&amp;_a]:text-blue-600', false)
         ->assertSee('text-base-content/85', false)
+        ->assertSee('flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-box border border-base-300 bg-base-200', false)
+        ->assertSee('h-full w-full object-contain', false)
         ->assertSee('Project screenshot alt text')
         ->assertSee('Active experience card')
         ->assertSee('href="https://github.com/andrewbielecki"', false)
