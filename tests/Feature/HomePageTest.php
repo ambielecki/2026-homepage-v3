@@ -264,12 +264,12 @@ test('the production homepage offers analytics consent when configured', functio
         ->assertSee('data-analytics-consent', false)
         ->assertSee('data-measurement-id="G-TEST123"', false)
         ->assertSee('max-w-5xl', false)
-        ->assertSee('lg:alert-horizontal', false)
+        ->assertSee('sm:justify-end', false)
         ->assertSee('Allow analytics')
         ->assertSee('Reject analytics')
         ->assertSee('Cookie settings')
         ->assertSee('href="'.route('privacy').'"', false)
-        ->assertDontSee('sm:alert-horizontal', false)
+        ->assertDontSee('alert-horizontal', false)
         ->assertDontSee('<script src="https://www.googletagmanager.com', false);
 });
 
