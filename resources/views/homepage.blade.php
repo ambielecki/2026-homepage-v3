@@ -6,6 +6,8 @@
             $metaTitle = $homepage->resolvedMetaTitle();
             $metaDescription = $homepage->resolvedMetaDescription();
             $isPreviewPage = $isPreview ?? false;
+            $analyticsMeasurementId = (string) config('services.google_analytics.measurement_id');
+            $analyticsEnabled = config('app.env') === 'production' && ! $isPreviewPage && filled($analyticsMeasurementId);
             $robotsContent = config('app.env') === 'production' && ! $isPreviewPage ? 'index, follow' : 'noindex, nofollow';
             $socialImage = $homepage->heroImage;
             $socialImageUrl = $socialImage ? $socialImage->originalUrl() : asset('social-card.png');
@@ -271,9 +273,19 @@
         </main>
 
         <footer class="border-t border-base-300 py-8">
-            <div class="mx-auto max-w-7xl px-4 text-sm text-base-content/60 sm:px-6 lg:px-8">
-                &copy; 2026 Andrew Bielecki
+            <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 text-sm text-base-content/60 sm:px-6 lg:px-8">
+                <span>&copy; 2026 Andrew Bielecki</span>
+                <div class="flex flex-wrap items-center gap-4">
+                    <a class="link link-hover" href="{{ route('privacy') }}">Privacy</a>
+                    @if ($analyticsEnabled)
+                        <button class="link link-hover" type="button" data-analytics-settings>Cookie settings</button>
+                    @endif
+                </div>
             </div>
         </footer>
+
+        @if ($analyticsEnabled)
+            <x-analytics-consent :measurement-id="$analyticsMeasurementId" />
+        @endif
     </body>
 </html>

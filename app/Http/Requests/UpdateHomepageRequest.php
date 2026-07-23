@@ -23,6 +23,7 @@ class UpdateHomepageRequest extends FormRequest
             'hero_image_id' => ['nullable', 'integer', 'exists:images,id'],
             'meta_title' => ['nullable', 'string', 'max:70'],
             'meta_description' => ['nullable', 'string', 'max:160'],
+            'privacy_contact_email' => ['nullable', 'email', 'max:254'],
             'hero_headline' => ['required', 'string', 'max:255'],
             'hero_title' => ['required', 'string', 'max:255'],
             'hero_description' => ['required', 'string', 'max:2000'],

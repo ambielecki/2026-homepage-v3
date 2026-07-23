@@ -87,6 +87,7 @@ test('authenticated admins can edit project urls in the project section', functi
 test('authenticated admins can preview any homepage version without activating it', function (): void {
     $user = User::factory()->create();
     config(['app.env' => 'production']);
+    config(['services.google_analytics.measurement_id' => 'G-TEST123']);
     $active = Homepage::factory()->active()->create([
         'hero_title' => 'Currently active homepage',
     ]);
@@ -114,6 +115,8 @@ test('authenticated admins can preview any homepage version without activating i
         ->assertSee('Draft homepage title')
         ->assertSee('Draft expertise')
         ->assertSee('Edit version')
+        ->assertDontSee('data-analytics-consent', false)
+        ->assertDontSee('Cookie settings')
         ->assertDontSee('Currently active homepage');
 
     expect($active->fresh()->is_active)->toBeTrue()
@@ -136,6 +139,20 @@ test('authenticated admins can edit homepage seo fields', function (): void {
         ->assertSee('value="Editable SEO title"', false)
         ->assertSee('name="meta_description"', false)
         ->assertSee('Editable SEO description.');
+});
+
+test('authenticated admins can edit the privacy contact email', function (): void {
+    $user = User::factory()->create();
+    $homepage = Homepage::factory()->create([
+        'privacy_contact_email' => 'privacy@andrewbielecki.com',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('admin.homepage.edit', $homepage))
+        ->assertOk()
+        ->assertSee('Privacy and analytics')
+        ->assertSee('name="privacy_contact_email"', false)
+        ->assertSee('value="privacy@andrewbielecki.com"', false);
 });
 
 test('authenticated admins can edit optional section visibility', function (): void {
@@ -202,6 +219,7 @@ test('authenticated admins can save homepage edits as a new draft version with a
         'hero_image_id' => $image->id,
         'meta_title' => 'Updated SEO title',
         'meta_description' => 'Updated SEO description.',
+        'privacy_contact_email' => 'privacy@andrewbielecki.com',
         'hero_headline' => 'Updated hero headline',
         'hero_title' => 'Updated hero title',
         'hero_description' => 'Updated hero description.',
@@ -265,6 +283,7 @@ test('authenticated admins can save homepage edits as a new draft version with a
         ->and($newHomepage->hero_image_id)->toBe($image->id)
         ->and($newHomepage->meta_title)->toBe('Updated SEO title')
         ->and($newHomepage->meta_description)->toBe('Updated SEO description.')
+        ->and($newHomepage->privacy_contact_email)->toBe('privacy@andrewbielecki.com')
         ->and($newHomepage->show_expertise_section)->toBeFalse()
         ->and($newHomepage->show_experience_section)->toBeTrue()
         ->and($newHomepage->github_url)->toBe('https://github.com/andrewbielecki')
@@ -295,6 +314,7 @@ test('authenticated admins can save a homepage without contact description text'
         'contact_headline' => 'Contact headline',
         'contact_title' => 'Contact title',
         'contact_description' => null,
+        'privacy_contact_email' => null,
         'github_url' => 'https://github.com/andrewbielecki',
         'linkedin_url' => 'https://www.linkedin.com/in/andrewbielecki',
     ]);
@@ -307,7 +327,23 @@ test('authenticated admins can save a homepage without contact description text'
         ->assertRedirect(route('admin.homepage.edit', $newHomepage))
         ->assertSessionHas('status', 'Homepage saved as a new draft version.');
 
-    expect($newHomepage->contact_description)->toBeNull();
+    expect($newHomepage->contact_description)->toBeNull()
+        ->and($newHomepage->privacy_contact_email)->toBeNull();
+});
+
+test('homepage privacy contact email must be valid', function (): void {
+    $user = User::factory()->create();
+    $homepage = Homepage::factory()->create();
+    $payload = Homepage::defaultAttributes('Invalid privacy email');
+    $payload['privacy_contact_email'] = 'not-an-email';
+
+    $this->actingAs($user)
+        ->from(route('admin.homepage.edit', $homepage))
+        ->put(route('admin.homepage.update', $homepage), $payload)
+        ->assertRedirect(route('admin.homepage.edit', $homepage))
+        ->assertSessionHasErrors('privacy_contact_email');
+
+    expect(Homepage::query()->count())->toBe(1);
 });
 
 test('authenticated admins can activate one homepage version', function (): void {
@@ -331,6 +367,7 @@ test('authenticated admins can duplicate a homepage version with assignments', f
         'name' => 'Original version',
         'meta_title' => 'Original SEO title',
         'meta_description' => 'Original SEO description.',
+        'privacy_contact_email' => 'privacy@andrewbielecki.com',
         'show_expertise_section' => false,
         'show_experience_section' => true,
     ]);
@@ -361,6 +398,7 @@ test('authenticated admins can duplicate a homepage version with assignments', f
     expect($clone->is_active)->toBeFalse()
         ->and($clone->meta_title)->toBe('Original SEO title')
         ->and($clone->meta_description)->toBe('Original SEO description.')
+        ->and($clone->privacy_contact_email)->toBe('privacy@andrewbielecki.com')
         ->and($clone->show_expertise_section)->toBeFalse()
         ->and($clone->show_experience_section)->toBeTrue()
         ->and($clone->expertiseCards()->whereKey($expertise->id)->exists())->toBeTrue()
