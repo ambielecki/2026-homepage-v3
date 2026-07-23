@@ -7,7 +7,7 @@
     data-analytics-consent
     data-measurement-id="{{ $measurementId }}"
 >
-    <div role="alert" class="alert alert-vertical mx-auto max-w-4xl border border-base-300 bg-base-100 shadow-xl sm:alert-horizontal">
+    <div role="alert" class="alert alert-vertical mx-auto max-w-5xl border border-base-300 bg-base-100 shadow-xl lg:alert-horizontal">
         <div class="min-w-0">
             <h2 class="font-semibold">Optional analytics</h2>
             <p class="mt-1 text-sm leading-6 text-base-content/75">
