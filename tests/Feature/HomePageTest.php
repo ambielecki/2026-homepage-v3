@@ -42,8 +42,10 @@ test('the homepage returns a successful response with default content when no ve
         ->assertSee('type="image/svg+xml" href="'.asset('favicon.svg').'"', false)
         ->assertSee('href="'.asset('apple-touch-icon.png').'"', false)
         ->assertSee('href="'.asset('site.webmanifest').'"', false)
+        ->assertSee('href="'.route('privacy').'"', false)
         ->assertDontSee('Start a conversation')
         ->assertDontSee('View hobby projects')
+        ->assertDontSee('data-analytics-consent', false)
         ->assertDontSee('href="#github-placeholder"', false)
         ->assertDontSee('href="#linkedin-placeholder"', false);
 });
@@ -250,6 +252,77 @@ test('the production homepage allows indexing', function (): void {
         ->assertSee('name="robots" content="index, follow"', false);
 });
 
+test('the production homepage offers analytics consent when configured', function (): void {
+    config([
+        'app.env' => 'production',
+        'services.google_analytics.measurement_id' => 'G-TEST123',
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('data-analytics-consent', false)
+        ->assertSee('data-measurement-id="G-TEST123"', false)
+        ->assertSee('Allow analytics')
+        ->assertSee('Reject analytics')
+        ->assertSee('Cookie settings')
+        ->assertSee('href="'.route('privacy').'"', false)
+        ->assertDontSee('<script src="https://www.googletagmanager.com', false);
+});
+
+test('the homepage omits analytics outside production or without a measurement id', function (): void {
+    config([
+        'app.env' => 'local',
+        'services.google_analytics.measurement_id' => 'G-TEST123',
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertDontSee('data-analytics-consent', false)
+        ->assertDontSee('data-measurement-id', false)
+        ->assertDontSee('Cookie settings');
+
+    config([
+        'app.env' => 'production',
+        'services.google_analytics.measurement_id' => null,
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertDontSee('data-analytics-consent', false)
+        ->assertDontSee('Cookie settings');
+});
+
+test('the privacy notice uses only the active homepage privacy contact', function (): void {
+    Homepage::factory()->active()->create([
+        'privacy_contact_email' => 'privacy@andrewbielecki.com',
+    ]);
+    Homepage::factory()->create([
+        'privacy_contact_email' => 'draft@example.com',
+    ]);
+
+    $this->get(route('privacy'))
+        ->assertOk()
+        ->assertSee('<title>Privacy Notice | Andrew Bielecki</title>', false)
+        ->assertSee('name="robots" content="noindex, follow"', false)
+        ->assertSee('Necessary cookies')
+        ->assertSee('XSRF-TOKEN')
+        ->assertSee('href="mailto:privacy@andrewbielecki.com"', false)
+        ->assertSee('privacy@andrewbielecki.com')
+        ->assertDontSee('draft@example.com')
+        ->assertDontSee('data-analytics-consent', false);
+});
+
+test('the privacy notice omits contact details when no active email is configured', function (): void {
+    Homepage::factory()->active()->create([
+        'privacy_contact_email' => null,
+    ]);
+
+    $this->get(route('privacy'))
+        ->assertOk()
+        ->assertDontSee('data-privacy-contact', false)
+        ->assertDontSee('mailto:', false);
+});
+
 test('robots points crawlers to the homepage sitemap', function (): void {
     config(['app.url' => 'https://www.andrewbielecki.com']);
 
@@ -270,6 +343,7 @@ test('the sitemap includes only the public homepage', function (): void {
         ->assertOk()
         ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
         ->assertSee('<loc>https://www.andrewbielecki.com</loc>', false)
+        ->assertDontSee('/privacy')
         ->assertDontSee('/login')
         ->assertDontSee('/admin')
         ->assertDontSee('/admin/homepage')

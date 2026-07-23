@@ -121,6 +121,21 @@
 
             <div class="card card-border bg-base-100">
                 <div class="card-body">
+                    <h2 class="card-title">Privacy and analytics</h2>
+
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Privacy contact email</legend>
+                        <input class="input w-full @error('privacy_contact_email') input-error @enderror" type="email" name="privacy_contact_email" value="{{ old('privacy_contact_email', $homepage->privacy_contact_email) }}" maxlength="254">
+                        <p class="label">Optional. The active version's address appears in the public privacy notice for questions and data requests.</p>
+                        @error('privacy_contact_email')
+                            <p class="label text-error">{{ $message }}</p>
+                        @enderror
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="card card-border bg-base-100">
+                <div class="card-body">
                     <h2 class="card-title">Hero section</h2>
 
                     <div class="grid gap-4 lg:grid-cols-2">

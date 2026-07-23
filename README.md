@@ -16,6 +16,8 @@ This repository contains the Laravel application for [andrewbielecki.com](https:
 - Public homepage at `/`
 - Responsive employer-focused profile layout
 - SEO, canonical, Open Graph, Twitter card, robots, and homepage sitemap metadata
+- Consent-gated Google Analytics on the production homepage with a public privacy notice
+- Versioned privacy contact email management in the homepage admin
 - Admin-editable SEO title and description fields with sensible homepage fallbacks
 - daisyUI theme with a modern blue-led palette
 - Database-backed homepage versions for hero, expertise, hobby projects, experience, and contact content
