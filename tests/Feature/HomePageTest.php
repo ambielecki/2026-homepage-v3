@@ -43,9 +43,11 @@ test('the homepage returns a successful response with default content when no ve
         ->assertSee('href="'.asset('apple-touch-icon.png').'"', false)
         ->assertSee('href="'.asset('site.webmanifest').'"', false)
         ->assertSee('href="'.route('privacy').'"', false)
+        ->assertSee('data-analytics-consent', false)
+        ->assertSee('data-measurement-id=""', false)
+        ->assertSee('Cookie settings')
         ->assertDontSee('Start a conversation')
         ->assertDontSee('View hobby projects')
-        ->assertDontSee('data-analytics-consent', false)
         ->assertDontSee('href="#github-placeholder"', false)
         ->assertDontSee('href="#linkedin-placeholder"', false);
 });
@@ -157,7 +159,6 @@ test('the homepage renders the active database version and hides inactive rows',
         ->assertSee('href="https://www.linkedin.com/in/andrewbielecki"', false)
         ->assertDontSee('text-primary', false)
         ->assertDontSee('text-base-content/70', false)
-        ->assertDontSee('text-base-content/75', false)
         ->assertDontSee('Inactive expertise card')
         ->assertDontSee('Inactive hobby project')
         ->assertDontSee('Inactive experience card')
@@ -262,14 +263,17 @@ test('the production homepage offers analytics consent when configured', functio
         ->assertOk()
         ->assertSee('data-analytics-consent', false)
         ->assertSee('data-measurement-id="G-TEST123"', false)
+        ->assertSee('max-w-5xl', false)
+        ->assertSee('sm:justify-end', false)
         ->assertSee('Allow analytics')
         ->assertSee('Reject analytics')
         ->assertSee('Cookie settings')
         ->assertSee('href="'.route('privacy').'"', false)
+        ->assertDontSee('alert-horizontal', false)
         ->assertDontSee('<script src="https://www.googletagmanager.com', false);
 });
 
-test('the homepage omits analytics outside production or without a measurement id', function (): void {
+test('the homepage shows consent without enabling analytics outside production', function (): void {
     config([
         'app.env' => 'local',
         'services.google_analytics.measurement_id' => 'G-TEST123',
@@ -277,10 +281,14 @@ test('the homepage omits analytics outside production or without a measurement i
 
     $this->get('/')
         ->assertOk()
-        ->assertDontSee('data-analytics-consent', false)
-        ->assertDontSee('data-measurement-id', false)
-        ->assertDontSee('Cookie settings');
+        ->assertSee('data-analytics-consent', false)
+        ->assertSee('data-measurement-id=""', false)
+        ->assertSee('Cookie settings')
+        ->assertDontSee('data-measurement-id="G-TEST123"', false)
+        ->assertDontSee('<script src="https://www.googletagmanager.com', false);
+});
 
+test('the production homepage omits consent when analytics is not configured', function (): void {
     config([
         'app.env' => 'production',
         'services.google_analytics.measurement_id' => null,

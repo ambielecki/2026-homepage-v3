@@ -21,7 +21,7 @@
 ## Implementation Changes
 
 - Add a nullable `GOOGLE_ANALYTICS_ID` environment setting exposed through Laravel configuration. Treat a missing or blank ID as analytics disabled.
-- Add a reusable Blade analytics and consent partial to the public homepage. Render its configuration only when the environment is `production`, the ID is present, and the view is not a preview.
+- Add a reusable Blade analytics and consent partial to the public homepage in every environment except authenticated previews. Pass its measurement configuration only when the environment is `production` and the ID is present, so non-production environments can exercise the consent UI without loading Google Analytics.
 - Extend the existing frontend JavaScript with DOM-gated consent handling:
   - Store `{choice, expires_at}` in local storage.
   - Keep all Consent Mode v2 categories denied by default.
@@ -41,8 +41,8 @@
 
 ## Test Plan
 
-- Add Pest coverage to `HomePageTest` proving the measurement configuration and consent UI appear only for a production homepage with a non-empty measurement ID.
-- Verify analytics markup is absent in local and testing environments, when the ID is missing, and on authenticated homepage previews.
+- Add Pest coverage to `HomePageTest` proving production homepages receive the configured measurement ID, non-production homepages render consent without an ID, and production homepages without configuration do not present a non-functional consent choice.
+- Verify the consent UI renders without a usable measurement ID in local and testing environments, analytics remains disabled there, and all consent markup stays absent on authenticated homepage previews.
 - Add admin homepage tests for rendering the optional email field, accepting a valid address, rejecting invalid addresses, clearing the value, carrying it into the newly saved draft, and preserving it when duplicating a version.
 - Test that `/privacy` is public, contains the required disclosures, is linked from the homepage, has `noindex, follow`, and remains excluded from the sitemap.
 - Test that the privacy notice renders the active version's email as a safe `mailto:` link, ignores draft-version addresses, and omits the contact section when the active version or fallback content has no address.

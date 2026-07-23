@@ -6,8 +6,10 @@
             $metaTitle = $homepage->resolvedMetaTitle();
             $metaDescription = $homepage->resolvedMetaDescription();
             $isPreviewPage = $isPreview ?? false;
-            $analyticsMeasurementId = (string) config('services.google_analytics.measurement_id');
-            $analyticsEnabled = config('app.env') === 'production' && ! $isPreviewPage && filled($analyticsMeasurementId);
+            $configuredAnalyticsMeasurementId = (string) config('services.google_analytics.measurement_id');
+            $analyticsEnabled = config('app.env') === 'production' && ! $isPreviewPage && filled($configuredAnalyticsMeasurementId);
+            $showAnalyticsConsent = ! $isPreviewPage && (config('app.env') !== 'production' || $analyticsEnabled);
+            $analyticsMeasurementId = $analyticsEnabled ? $configuredAnalyticsMeasurementId : '';
             $robotsContent = config('app.env') === 'production' && ! $isPreviewPage ? 'index, follow' : 'noindex, nofollow';
             $socialImage = $homepage->heroImage;
             $socialImageUrl = $socialImage ? $socialImage->originalUrl() : asset('social-card.png');
@@ -277,14 +279,14 @@
                 <span>&copy; 2026 Andrew Bielecki</span>
                 <div class="flex flex-wrap items-center gap-4">
                     <a class="link link-hover" href="{{ route('privacy') }}">Privacy</a>
-                    @if ($analyticsEnabled)
+                    @if ($showAnalyticsConsent)
                         <button class="link link-hover" type="button" data-analytics-settings>Cookie settings</button>
                     @endif
                 </div>
             </div>
         </footer>
 
-        @if ($analyticsEnabled)
+        @if ($showAnalyticsConsent)
             <x-analytics-consent :measurement-id="$analyticsMeasurementId" />
         @endif
     </body>
